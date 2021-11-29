@@ -1,0 +1,41 @@
+
+ {"Scenario": {
+   "Site": {
+   	"latitude": 40.71,
+   	"longitude": -74.01,
+   	"roof_squarefeet": 100000,
+   	"land_acres": 10,
+  "ElectricTariff": {
+      "year": 2019,
+   		"urdb_label": "6112d0d95457a35c66f802c9", 
+   		"net_metering_limit_kw": 0.0, 
+   		"interconnection_limit_kw": 100000000.0},
+   	"PV": {
+   		"min_kw": 0,
+   		"max_kw": 0,
+   		"installed_cost_us_dollars_per_kw": 2490.0,
+   		"om_cost_us_dollars_per_kw": 19.0,
+   		"macrs_option_years": 5,
+   		"federal_itc_pct": 0.26,
+   		"array_type": 1,
+   		"tilt": 10},
+   	"Storage": {
+   		"min_kwh": 0.0,
+   		"max_kwh": 0.0,
+   		"min_kw": 0.0,
+   		"max_kw": 0.0,
+   		"total_itc_pct": 0.234,
+   		"macrs_option_years": 5,
+   		"installed_cost_us_dollars_per_kwh": 544.0,
+   		"installed_cost_us_dollars_per_kw": 581.0,
+   		"replace_cost_us_dollars_per_kwh": 302.0,
+   		"replace_cost_us_dollars_per_kw": 323.0,
+   		"battery_replacement_year": 10,
+   		"inverter_replacement_year": 10,
+   		"canGridCharge": true,
+   		"soc_min_pct": 0.2,
+   		"soc_init_pct": 0.5}
+    }
+  }
+}
+
