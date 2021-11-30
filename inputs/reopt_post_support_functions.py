@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 import os 
-from nova_metrics.support.utils import * 
 import pandas as pd
-import copy
+from nova_metrics.support.utils import get_filename, parse_properties, get_system_sizes, get_hvac_inputs 
 # import collections.abc
 
 #%%
@@ -32,21 +31,19 @@ hp_fan_power_col = 'HVAC Heating Fan Power (kW)'
 hp_main_power_col = 'HVAC Heating Main Power (kW)'
 hp_er_col = 'HVAC Heating ER Power (kW)'
 #%%
-#Combines two nested dictionaries into one
-# def update_nested_dict(d, u):
-#     for k, v in u.items():
-#         if isinstance(v, collections.abc.Mapping):
-#             d[k] = update_nested_dict(d.get(k, {}), v)
-#         else:
-#             d[k] = v
-#     return d
-
-
-#loads relevant files from OCHRE folder given by file_path
 def load_ochre_outputs(file_path):
-   #properties_file
-    # print("Loading OCHRE Outputs", file_path)
+    """
+    Return list of OCHRE building model output results.
+    
+    `file_path` is path to OCHRE output folder. 
+    OCHRE output folder must have files with the following in their names:
+        - .properties
+        - _Envelope_matrixA.csv
+        - _Water Tank_matrixA.csv
+        - _Water Tank_matrixB.csv
 
+    Returns a list of [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
+    """
     properties_file = get_filename(file_path, '.properties')            
     parsed_prop = parse_properties(os.path.join(file_path, properties_file))
     
@@ -67,68 +64,68 @@ def load_ochre_outputs(file_path):
     return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
 
 #%%
-#Takes in input dictionary and outputs REopt post dictionary
-def get_REopt_post(inputs, main_folder_path):
-    OCHRE_outputs = load_OCHRE_outputs(os.path.join(main_folder_path, inputs["FilePaths"]["ochre_folder_path"]))
+# #Takes in input dictionary and outputs REopt post dictionary
+# def get_REopt_post(inputs, main_folder_path):
+#     OCHRE_outputs = load_OCHRE_outputs(os.path.join(main_folder_path, inputs["FilePaths"]["ochre_folder_path"]))
     
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = OCHRE_outputs
+#     parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = OCHRE_outputs
     
-    #Start with dictionary of default post
-    post = copy.deepcopy(inputs["DefaultPost"])
+#     #Start with dictionary of default post
+#     post = copy.deepcopy(inputs["DefaultPost"])
     
-    #additional costs do not have way to be passed through REopt run to metrics, so are included in scenario description, which is otherwise unused
-    post["Scenario"]["description"] = inputs["additional_costs"]
+#     #additional costs do not have way to be passed through REopt run to metrics, so are included in scenario description, which is otherwise unused
+#     post["Scenario"]["description"] = inputs["additional_costs"]
 
-    #Scenario inputs are under keyword "PostValues"
-    update_post_vals = {"Scenario": {"Site": inputs["PostValues"]}}
-    update_nested_dict(post, update_post_vals)
+#     #Scenario inputs are under keyword "PostValues"
+#     update_post_vals = {"Scenario": {"Site": inputs["PostValues"]}}
+#     update_nested_dict(post, update_post_vals)
 
-    #Get building load
-    if "optional_load" in inputs:
-        load = inputs["Building"]["optional_load"]
-    else:
-        load = hourly_inputs.loc[:, elec_load_col]
-    post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(load)
+#     #Get building load
+#     if "optional_load" in inputs:
+#         load = inputs["Building"]["optional_load"]
+#     else:
+#         load = hourly_inputs.loc[:, elec_load_col]
+#     post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(load)
     
     
-    #Option for custom rate
-    if "custom_rate" in inputs: 
-        post['Scenario']['Site']['ElectricTariff']['urdb_response'] = inputs["custom_rate"] 
+#     #Option for custom rate
+#     if "custom_rate" in inputs: 
+#         post['Scenario']['Site']['ElectricTariff']['urdb_response'] = inputs["custom_rate"] 
 
-    if post['Scenario']['Site']['PV']['max_kw'] > 0:
-        post['Scenario']['Site']['PV']['prod_factor_series_kw'] = inputs["PV_prod_factor_series_kw"] 
+#     if post['Scenario']['Site']['PV']['max_kw'] > 0:
+#         post['Scenario']['Site']['PV']['prod_factor_series_kw'] = inputs["PV_prod_factor_series_kw"] 
       
-    #Add water heater    
-    if "WH" in inputs:
-        wh_inputs = inputs["Water_Heater"]
-        wh_post(post, parsed_prop, OCHRE_outputs, wh_inputs)
+#     #Add water heater    
+#     if "WH" in inputs:
+#         wh_inputs = inputs["Water_Heater"]
+#         wh_post(post, parsed_prop, OCHRE_outputs, wh_inputs)
         
-    #Add HVAC  
-    if "HVAC" in inputs: 
-        HVAC_inputs = inputs["HVAC"]
-        HVAC_post(post, OCHRE_outputs, HVAC_inputs)
+#     #Add HVAC  
+#     if "HVAC" in inputs: 
+#         HVAC_inputs = inputs["HVAC"]
+#         HVAC_post(post, OCHRE_outputs, HVAC_inputs)
 
-    #TODO See if this needs to be added or not
-    # if not ("WH" in inputs or "HVAC" in inputs):
-    #     post['Scenario']['Site']['RC']['use_flexloads_model'] = False
-    #     post['Scenario']['Site']['FlexTechERWH']['size_kw'] = 0
-    #     post['Scenario']['Site']['FlexTechHPWH']['size_kw'] = 0
-    #     # ra_post=None
+#     #TODO See if this needs to be added or not
+#     # if not ("WH" in inputs or "HVAC" in inputs):
+#     #     post['Scenario']['Site']['RC']['use_flexloads_model'] = False
+#     #     post['Scenario']['Site']['FlexTechERWH']['size_kw'] = 0
+#     #     post['Scenario']['Site']['FlexTechHPWH']['size_kw'] = 0
+#     #     # ra_post=None
     
-    # custom_post = None 
-    # if inputs["utility"]["urdb_label"] == 'custom':
-    #     custom_post = load_post(inputs["custom_post"]["custom_post_data_path"], inputs["custom_post_filename"])
-    # Save some OCHRE outputs in REopt results
-    #TODO See if the ochre outputs part can be removed
-    ochre_outputs = {}
-    ochre_outputs['indoor_temp_degC'] = list(hourly_inputs.loc[:, space_node_col])
-    ochre_outputs['outdoor_temp_degC'] = list((hourly_inputs.loc[:, 'Temperature - Outdoor (C)'] * 9/5) + 32)
-    ochre_outputs['hvac_cooling_delivered_kw'] = list(hourly_inputs.loc[:, ac_delivered_col])
-    ochre_outputs['hvac_heating_delivered_kw'] = list(hourly_inputs.loc[:, hp_delivered_col])
-    ochre_outputs['hvac_cooling_elec_power_kw'] = list(hourly_inputs.loc[:, ac_consumption_col])
-    ochre_outputs['hvac_heating_elec_power_kw'] = list(hourly_inputs.loc[:, hp_consumption_col])
+#     # custom_post = None 
+#     # if inputs["utility"]["urdb_label"] == 'custom':
+#     #     custom_post = load_post(inputs["custom_post"]["custom_post_data_path"], inputs["custom_post_filename"])
+#     # Save some OCHRE outputs in REopt results
+#     #TODO See if the ochre outputs part can be removed
+#     ochre_outputs = {}
+#     ochre_outputs['indoor_temp_degC'] = list(hourly_inputs.loc[:, space_node_col])
+#     ochre_outputs['outdoor_temp_degC'] = list((hourly_inputs.loc[:, 'Temperature - Outdoor (C)'] * 9/5) + 32)
+#     ochre_outputs['hvac_cooling_delivered_kw'] = list(hourly_inputs.loc[:, ac_delivered_col])
+#     ochre_outputs['hvac_heating_delivered_kw'] = list(hourly_inputs.loc[:, hp_delivered_col])
+#     ochre_outputs['hvac_cooling_elec_power_kw'] = list(hourly_inputs.loc[:, ac_consumption_col])
+#     ochre_outputs['hvac_heating_elec_power_kw'] = list(hourly_inputs.loc[:, hp_consumption_col])
     
-    return post, ochre_outputs
+#     return post, ochre_outputs
                         
  
 
@@ -282,4 +279,13 @@ def hvac_post(post, OCHRE_outputs, HVAC_inputs):
     
     return None
     
+
+#Combines two nested dictionaries into one
+# def update_nested_dict(d, u):
+#     for k, v in u.items():
+#         if isinstance(v, collections.abc.Mapping):
+#             d[k] = update_nested_dict(d.get(k, {}), v)
+#         else:
+#             d[k] = v
+#     return d
 

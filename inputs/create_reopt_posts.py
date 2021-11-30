@@ -1,12 +1,16 @@
+"""creates REopt input json files from inputs from Excel sheet `inputs_file_name`
+
+`create_reopt_posts` batch creates posts for all scenarios while 
+`create_single_reopt_post` creates post for a single scenario
+
+"""
 import os 
-# os.chdir(os.path.dirname(__file__))
 import pandas as pd
 import numpy as np
 import json
 import copy
 # import collections.abc
 import pathlib
-
 from nova_metrics.apiquery.download_pv_watts import download_pv_watts
 # import nova_metrics.apiquery.find_urdb as Find_URDB
 #TODO add water heater and HVAC inputs
@@ -15,6 +19,34 @@ from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs
 from nova_metrics.support.logger import log
 #%%
 def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "", ochre_output_main_folder = ""):
+    """
+    Create reopt json posts from input excel sheet in `inputs_folder`/`inputs_file_name`.
+
+    Use default_values_file json as template, and updates values based on input values. 
+    Saves posts to `main_output_folder` and specified subfolder. 
+    If `add_pv_prod_factor` is True, then searches for pv factor csv in `solar_profile_folder` 
+    and downloads from PV watts https://developer.nrel.gov/docs/solar/pvwatts/v6/ if needed.
+    Optional ability to load load profiles from OCHRE model outputs.      
+
+    Parameters
+    ----------
+    input_folder : str
+        Path to folder which cointains default json and inputs Excel file.
+    inputs_file_name : str
+        Name of inputs Excel file.
+    default_values_file : str
+        Name of default json template.
+    main_output_folder : str
+        folder path where REopt posts are saved.
+    add_pv_prod_factor : bool
+        if True, then adds pv factors to post.
+    solar_profile_folder : str
+        path to folder where solar profiles are saved.
+    pv_watts_api_key : str
+        key to download solar proviles from PV watts.
+    ocher_output_main_folder : str
+        path to OCHRE building model output.
+    """
     pathlib.Path(solar_profile_folder).mkdir(parents=True, exist_ok=True)
     
     inputs_df = pd.read_excel(os.path.join(inputs_folder, inputs_file_name), sheet_name='REopt Posts')
@@ -25,6 +57,34 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
       
 #%%
 def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "./", pv_watts_api_key = "", ochre_output_main_folder = ""):
+    """
+    Create single reopt json posts using `defaults` as template and adding `input_vals`
+
+    Parses `inputs_vals` and adds values to defaults to create REopt post.
+    Saves post to `main_output_folder`/`optional_subfolder` where the subfolder can be defined in `inputs_vals`. 
+    
+    Saves posts to `main_output_folder` and specified subfolder. 
+    If `add_pv_prod_factor` is True, then searches for pv factor csv in `solar_profile_folder` 
+    and downloads from PV watts https://developer.nrel.gov/docs/solar/pvwatts/v6/ if needed.
+    Optional ability to load load profiles from OCHRE model outputs.      
+
+    Parameters
+    ----------
+    defaults : dict
+        Dictionary of template of default inputs. Unspecified values default to REopt defaults
+    input_vals : pandas DataFrame row
+        Row slice from pandas DataFrame Inputs
+    main_output_folder : str
+        folder path where REopt posts are saved.
+    add_pv_prod_factor : bool
+        if True, then adds pv factors to post.
+    solar_profile_folder : str
+        path to folder where solar profiles are saved.
+    pv_watts_api_key : str
+        key to download solar proviles from PV watts.
+    ocher_output_main_folder : str
+        path to OCHRE building model output.
+    """
     post = copy.deepcopy(defaults)
     file_name = input_vals["post_name"] + ".json"
 
@@ -67,6 +127,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         
     
 def update_post(post, name, val):
+    """Parses input value to REopt post"""
 
     if val != val:   #Checks if is nan
         pass
@@ -181,17 +242,17 @@ def update_post(post, name, val):
 
 
 #%%
-def add_default_tariff(location_vals, api_keys):
-    if "ElectricTariff" not in location_vals["Post Values"]:
-        location_vals["Post Values"]["ElectricTariff"] = {}
-    if "urdb_label" in location_vals["Post Values"]["ElectricTariff"]:
-        return None
-    elif "zipcode" in location_vals:
-        location_vals["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], zipcode = data[loc]["zipcode"])
-    elif "latitude" in location_vals["Post Values"]:
-       location_vals["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], lat = location_vals["Post Values"]["latitude"], lon = location_vals["Post Values"]["longitude"], google_api_key = api_keys["google_api_key"])
-    elif "utility_name" in location_vals:
-        location_val["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], utility_name = location_vals["utility_name"])
+# def add_default_tariff(location_vals, api_keys):
+#     if "ElectricTariff" not in location_vals["Post Values"]:
+#         location_vals["Post Values"]["ElectricTariff"] = {}
+#     if "urdb_label" in location_vals["Post Values"]["ElectricTariff"]:
+#         return None
+#     elif "zipcode" in location_vals:
+#         location_vals["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], zipcode = data[loc]["zipcode"])
+#     elif "latitude" in location_vals["Post Values"]:
+#        location_vals["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], lat = location_vals["Post Values"]["latitude"], lon = location_vals["Post Values"]["longitude"], google_api_key = api_keys["google_api_key"])
+#     elif "utility_name" in location_vals:
+#         location_val["Post Values"]["ElectricTariff"]["urdb_label"] = Find_URDB.get_default_urdb_label(api_keys["urdb_api_key"], utility_name = location_vals["utility_name"])
 
 #%%
 # def add_ra_values(post_values, ra_path):
@@ -239,14 +300,3 @@ def add_default_tariff(location_vals, api_keys):
 #                     if overwrite or not os.path.isfile(os.path.join(main_folder_path, "Posts", loc, bldg, "/".join(sce_type), sce + ".json")):
 #                         make_and_save_post(create_inputs(loc, location_vals, bldg, sce, scenario_vals, scenario_type = sce_type, main_folder_path = main_folder_path), main_folder_path)
 #     return building_basecases
-
-
-#%%    
-# api_keys = {"pv_watts_api_key": "gAfosXcQ9Ldfw3qXqvKVb7PxMEkYigozmC9R3mXQ", "urdb_api_key": "2qt5uihpKXdywTj3uMIhBewxY9K4eNjpRje1JUPL", "google_api_key" : "AIzaSyClR0k7J3W1i4yECOiVEcCW2dF0I_D7CdE"}
-# main_folder_path = "../Setup For Batch Runs"
-# 
-# # batch_create_scenarios(main_folder_path, "../Setup For Batch Runs", "scenario_setup.json", api_keys, add_default_tariff_boolian = True)
-# batch_create_scenarios("../Setup For Batch Runs", "scenario_setup.json", main_folder_path, api_keys, add_default_tariff_boolian = False)
-#%%
-
-

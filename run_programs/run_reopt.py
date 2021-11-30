@@ -10,15 +10,22 @@ import time
 import os 
 from pathlib import Path
 
-from nova_metrics.support.utils import *
+from nova_metrics.support.utils import load_post, save_post
 from nova_metrics.support.logger import log
 #%%
-def reo_optimize(post, api_key):
-    # API_KEY = 'yOODa4jmZy1q3Wd6lkQcne6izi3nq2YSIIlCQkOg'
-    root_url = 'https://developer.nrel.gov/api/reopt'
-    post_url = root_url + '/v1/job/?api_key=' + api_key
-    results_url = root_url + '/v1/job/<run_uuid>/results/?api_key=' + api_key
-
+def reo_optimize(post, API_KEY, root_url='https://developer.nrel.gov/api/reopt', poll_interval=10):
+    """
+    Function for polling the REopt API results URL until status is not "Optimizing..."
+    :post: the API reo /job endpoint POST which define the Scenario with user inputs
+    :param API_KEY: API key for accessing API on NREL's production server
+    :param root_url: location of the API to poll; use 'http://localhost:8000' for localhost, not 0.0.0.0.8000
+    :param poll_interval: seconds
+    :return: dictionary response (once status is not "Optimizing...")
+    """
+    
+    post_url = root_url + '/v1/job/?api_key=' + API_KEY
+    results_url = root_url + '/v1/job/<run_uuid>/results/?api_key=' + API_KEY
+    
     resp = requests.post(url=post_url, json=post)
 
     if not resp.ok:
@@ -32,49 +39,69 @@ def reo_optimize(post, api_key):
         except KeyError:
             msg = "Response from {} did not contain run_uuid.".format(post_url)
 
-        return poller(url=results_url.replace('<run_uuid>', run_id))
+        return poller(url=results_url.replace('<run_uuid>', run_id), poll_interval=poll_interval)
 
 #%%
 
-def poller(url, poll_interval=5):
+def poller(url, poll_interval):
     """
     Function for polling the REopt API results URL until status is not "Optimizing..."
     :param url: results url to poll
     :param poll_interval: seconds
     :return: dictionary response (once status is not "Optimizing...")
     """
-
     key_error_count = 0
-    key_error_threshold = 3
+    key_error_threshold = 4
     status = "Optimizing..."
-    log.info("Polling {} for results with interval of {}s...".format(url, poll_interval))
+    print("Polling {} for results with interval of {}s...".format(url, poll_interval))
     while True:
 
         resp = requests.get(url=url, verify=False)
-        resp_dict = json.loads(resp.content)
+        resp_dict = json.loads(resp.text)
 
         try:
             status = resp_dict['outputs']['Scenario']['status']
         except KeyError:
             key_error_count += 1
-            log.info('KeyError count: {}'.format(key_error_count))
+            print('KeyError count: {}'.format(key_error_count))
             if key_error_count > key_error_threshold:
-                log.info('Breaking polling loop due to KeyError count threshold of {} exceeded.'
-                         .format(key_error_threshold))
+                print('Breaking polling loop due to KeyError count threshold of {} exceeded.'.format(key_error_threshold))
                 break
 
         if status != "Optimizing...":
+            time.sleep(poll_interval)
+            resp = requests.get(url=url, verify=False)
+            resp_dict = json.loads(resp.text)
             break
         else:
+            # Add extra sleep time for slower-responding localhost calls
+            # even while results are expected to be in response after status != "Optimizing..."
             time.sleep(poll_interval)
 
     return resp_dict
 #%%
 
 
-def run_reopt(post_folder, results_folder, api_key, reopt_optimize_fun = reo_optimize):
-    # Path(os.path.join(main_folder, "REopt Results")).mkdir(parents=True, exist_ok=True) 
-    #Something magical happens here
+def run_reopt(post_folder, results_folder, api_key, root_url = 'https://developer.nrel.gov/api/reopt', poll_interval = 10):
+    """
+    Runs REopt posts in `post_folder` and saves results to `results_folder`
+    
+    Results saved in same subfolder structure as inputs.
+    Change `root_url` to 'http://localhost:8000' for localhost
+
+    Parameters
+    ----------
+    post_folder : str
+        Path to main folder for REopt posts. 
+    results_folder : str
+        Path to main folder for REopt results outputs.
+    api_key : str
+        API key for accessing API on NREL's production server.
+    root_url: str 
+        Location of the API to poll; use 'http://localhost:8000' for localhost.
+    poll_interval: int
+        Seconds between poll query
+    """
     file_paths = list(Path(post_folder).rglob("*.json"))
     path_list = [path.relative_to(post_folder) for path in file_paths]  
     
@@ -90,18 +117,5 @@ def run_reopt(post_folder, results_folder, api_key, reopt_optimize_fun = reo_opt
         if not os.path.isfile(results_file):
             print("Running REopt for", post_name)
             post = load_post(post_dir, post_name)
-            reopt_results = reo_optimize(post, api_key)
+            reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
             save_post(reopt_results, results_dir, post_name)
-            
-#%%
-# main_folder = "../Testing Runs"
-# path = os.path.join(main_folder, "Posts", "New York", "Baseline", "Flat-Rate")
-# post = load_post(path, "New York-Baseline-Flat-Rate-fixed_PV_6kW_NEM.json")
-
-# A = reo_optimize(post, API_KEY)
-# run_reopt(main_folder, reo_optimize, API_KEY)
-# reopt_results = reo_optimize(post, API_KEY)
-
-# save_post(retail_store_results, "../Setup For Batch Runs", "test.json")
-
-
