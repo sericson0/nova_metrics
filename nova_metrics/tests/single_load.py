@@ -3,12 +3,13 @@
 import os 
 import pandas as pd
 os.chdir(os.path.dirname(__file__))
-# os.chdir("../../")
+os.chdir("../../")
 #%%
 from nova_metrics.inputs.create_reopt_posts import create_reopt_posts
 from nova_metrics.run_programs.run_reopt import run_reopt
 from nova_metrics.analyze_results.generate_metrics import generate_metrics, generate_timeseries
 #%%
+os.chdir(os.path.dirname(__file__))
 
 main_folder = "./single_load"
 inputs_file_name = "Inputs.xlsx"
