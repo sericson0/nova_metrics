@@ -1,18 +1,38 @@
-# import os 
-# os.chdir(os.path.dirname(__file__))
+"""
+Functions to calculate and return metrics from REopt results
+
+Metrics are separated into the following categories: 
+-Financial : Monetary metrics such as LCC, NPV, and annual bill
+-Home : Home performance metrics such as annual net load
+-External : Utility and societal metrics such as emissions and grid peak contribution
+-System performance : Metrics for each system (PV, Storage, HP, ERWH)
+
+Metrics are categorized into zero-baseline and comparison. 
+Zero-baseline are metrics which do not need a baseline to calculate. Examples
+include annual building load and system performance.
+Comparison metrics are an increase / decrease compared to a baseline or are
+a rating compared to a baseline. Examples are NPV, load reduction, or HERS rating. 
+
+Function `generate_metrics` returns an Excel spreadsheet of compiled metrics, while
+`generate_timeseries` returns csv files of timeseries values for each scenario. 
+
+"""
 from pathlib import Path    
 import os
 import glob
 import numpy as np
 import pandas as pd
 pd.set_option('mode.chained_assignment', None)
-import openpyxl
 from nova_metrics.analyze_results.extract_results import extract_results
 HOURS = 8760
 #%%
 def cover_factor_metrics(results):
-    #Cover factor demand is fraction of demand covered by renewable energy
-    #Cover factor supply is fraction of PV generation consumed onsite
+    """
+    Return dictionary including cover factor demand and cover factor supply.
+    
+    Cover factor demand is generation consumed by building / building gross load.
+    Cover factor supply is fraction of PV generation consumed onsite.
+    """
     d = {}
     d["Home-cover_factor_demand"] = 1 - (results["load"]["annual_grid_purchases"]/sum(results["load"]["home_load"]))
     
@@ -23,7 +43,6 @@ def cover_factor_metrics(results):
     return d
 #%%
 def calculate_utility_metrics(results, grid_prices = []):
-    #Add grid prices to return wholesale grid utility metrics
     if len(grid_prices) == 0:
         return {"External-grid_peak_contribution": None, "External-average_grid_cost_dollars_per_kwh": None}
     else:    
@@ -39,14 +58,19 @@ def calculate_utility_metrics(results, grid_prices = []):
         
         d["External-grid_peak_contribution"] = grid_peak_contribution
     
-        #Cover Factor Demand is Generation Consumed by building / Building Gross load
+        
     
         d["External-average_grid_cost_dollars_per_kwh"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])/sum(results["load"]["home_load"])
         return d
 #%%
     
 def zero_baseline_metrics(results, grid_prices = []):
-    #Zero baseline metrics are all values which do not need a comparison to other results for baselining 
+    """
+    Return metrics which do not need a comparison to other results for baselining 
+    
+    Optional input of `grid_prices` vector to calculate wholesale grid metrics.
+    
+    """
     d = {}
     d["filename"] = results["metadata"]["filename"]
     d["Run Type-latitude"] = results["metadata"]["latitude"]
@@ -107,12 +131,19 @@ def zero_baseline_metrics(results, grid_prices = []):
     return d
 #%%
 def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
-    #Returns variety of metrics. Inputs include
-    #results from extract_results
-    #baseline results from baseline run extract results
-    #baseline_type: is tag to mark type of baseline. tech_baseline is same building but different technologies. building_baseline is same tech but different buildings
+    """Return metrics which compare REopt results to baseline results.
+    
+    Parameters
+    ----------
+    results : dict
+        Dictionary of results from extract_results for upgraded system
+    baseline : dict
+        Dictionary of results from extract_results for baseline system
+    baseline_type : str
+        Signifies type of baseline for the comparison (such as techs or building upgrades)
+        
+    """
     d = {}
-    #TODO Check what initial vs net capital costs are
     d["Financial-additional_capex"] = results["financial"]["initial_capital_costs"] - baseline["financial"]["initial_capital_costs"]
     
     d["Financial-npv"] = baseline["financial"]["LCC"] - results["financial"]["LCC"]
@@ -134,13 +165,36 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     d["baseline_type"] = baseline_type
     return d
 #%%
-#Creates metrics for single result and single baseline
-def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder, baseline_name, baseline_type, grid_price_path):
+#
+def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder, baseline_name, baseline_type, grid_price_path = None):
+    """
+    Return dictionary of metrics for single result and single baseline
+    
+    Parameters
+    ----------
+    results_folder : str
+        Path to results json files.
+    results_name : str
+        Name of REopt results json.
+    baseline_folder : str
+        Path to baseline json files.
+    baseline_name : str
+        Name of REopt baseline json.
+    baseline_type : str
+        String to identify baseline comparison type.
+    grid_price_path : str, optional
+        Input of path to grid price series.
+
+    Returns
+    -------
+    d : dic
+        Dictionary of both zero baseline and comparison metrics.
+
+    """
     if grid_price_path != grid_price_path:
         grid_prices = []
     else:
         grid_prices = pd.read_csv(grid_price_path).iloc[:,0].tolist()
-    # print(results_name, baseline_name)
     results = extract_results(results_folder, results_name)
     baseline = extract_results(baseline_folder, baseline_name)
     if baseline ["metadata"]["run_failed"] or results["metadata"]["run_failed"]:
@@ -153,11 +207,21 @@ def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder,
         return d
 #%%
 def get_timeseries_single_case(results_folder, results_name, timesereies_output_folder, output_file_name = ""):
-    # if grid_price_path != grid_price_path:
-    #     grid_prices = []
-    # else:
-    #     grid_prices = pd.read_csv(grid_price_path)[0].tolist()
-        
+    """
+    Writes csv file of timeseries from REopt results
+
+    Parameters
+    ----------
+    results_folder : str
+        Path to results json files.
+    results_name : str
+        Name of REopt results json.
+    timesereies_output_folder : str
+        Path to output folder.
+    output_file_name : str, optional
+        Name of timeseries output. If "" then use `results_name`.
+
+    """
     results = extract_results(results_folder, results_name)
     d = {}
     d["pv_exports"] = results["PV"]["hourly_exports"]
@@ -184,9 +248,6 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     d["energy_costs_per_kwh"] = results["utility_bill"]["energy_costs_per_kwh"]
     d["emand_cost_per_kw"] = results["utility_bill"]["demand_charge_per_kw"]
     
-    # if len(grid_prices) > 0:
-    #     d["wholesale_grid_prices"] = grid_prices
-    
     if output_file_name == "":
         output_file_name = results_name.replace(".json", "") + "_timeseries.csv"
     
@@ -194,11 +255,25 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     df = pd.DataFrame(d)
     df.to_csv(os.path.join(timesereies_output_folder, output_file_name), index=False)  
 #%%
-def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_results_file_name, wholesale_price_folder):
+def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_results_file_name, wholesale_price_folder = "./"):
+    """
+    Write an Excel sheet of metrics, with rows for each results--baseline pair.
+
+    Parameters
+    ----------
+    reopt_results_folder : str
+        path to main folder of REopt results jsons (main folder can have subfolders).
+    inputs : pandas dataframe
+        Pandas DataFrame produces from loading Inputs.xlsx Generate Metrics sheet.
+    metrics_folder : str
+        Folder to save metrics results to.
+    metrics_results_file_name : str
+        Name of Metrics outputs file. Needs .xlsx extension
+    wholesale_price_folder : str, optional
+        Path to wholesale prices. Defaults to './'.
+
+    """
     Path(metrics_folder).mkdir(parents=True, exist_ok=True)
-    # inputs = pd.read_excel(input_excel_file_path, sheet_name='Generate Metrics')
-    # inputs = pd.read_csv(input_csv_file_path)
-    
     metrics = pd.DataFrame(list(filter(None, [get_reopt_metrics_single_case(os.path.join(reopt_results_folder, inputs["results_folder"][i]), inputs["results_name"][i]+".json", 
                                                                             os.path.join(reopt_results_folder, inputs["baseline_folder"][i]), inputs["baseline_name"][i]+".json", 
                                                                             inputs["baseline_type"][i], os.path.join(wholesale_price_folder, inputs["wholesale_price_path"][i])) for i in range(len(inputs))])))
@@ -209,9 +284,6 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
     
     sheet = [name.split("-")[0] for name in metrics]
     unique_sheets = list(set(sheet))
-    # col_name = [name.split("-")[1] for name in metrics]
-    
-    # metrics.columns = col_name
     
     d = {}
     for b in unique_sheets:
@@ -223,7 +295,6 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
         d[b] = df
     ##
     with pd.ExcelWriter(os.path.join(metrics_folder, metrics_results_file_name)) as writer:
-        # for sheet_name, df_vals in d.items():
         for sheet_name in ["Run Type", "Financial", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
             d[sheet_name].to_excel(writer, sheet_name = sheet_name, index = False)
 #%%
@@ -239,20 +310,3 @@ def generate_timeseries(reopt_results_folder, timeseries_output_folder):
         output_file_name = file_name.replace(".json", "_timeseries.csv")
         
         get_timeseries_single_case(path_dir, file_name, output_folder, output_file_name)
-        
-    
-#%%
-# main_folder = "../../../Metrics at Home/Example Format"
-
-# vt_wholesale_prices = pd.read_csv(os.path.join(main_folder, "VT Hourly Prices.csv"))
-# vt_price_vector = vt_wholesale_prices["RT_LMP"].tolist()
-
-
-# inputs = pd.read_csv(os.path.join(main_folder, "Input values.csv"))
-# create_reopt_results(main_folder, os.path.join(main_folder, "Input values.csv"), os.path.join(main_folder, "Metrics Results.csv"), grid_prices = vt_price_vector)
-# a = pd.read("../../Metrics at Home/Example Building")
-
-# # main_folder = "../../../Metrics at Home/Example Format"
-
-# generate_timeseries(os.path.join(main_folder, "REopt Outputs"), os.path.join(main_folder, "Timeseries Outputs"), grid_prices = vt_price_vector)
-
