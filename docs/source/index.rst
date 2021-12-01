@@ -1,16 +1,27 @@
-.. nova_metrics documentation master file, created by
-   sphinx-quickstart on Wed Dec  1 15:57:24 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+Nova Metrics
+================
 
-Welcome to nova_metrics's documentation!
-========================================
+Nova Metrics provides a workflow for modeling building energy upgrades and producing relevant metrics. 
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   tutorial
+   running_a_project
+   inputs
+   metrics
 
+
+Updates & Changelog
+===================
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Changes & Migration
+
+   changelog/index
 
 Indices and tables
 ==================
@@ -18,3 +29,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
