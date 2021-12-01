@@ -7,11 +7,11 @@ Nova Metrics provides a workflow for modeling building energy upgrades and produ
    :maxdepth: 2
    :caption: Contents:
 
-   .. installation
-   .. tutorial
-   .. running_a_project
-   .. inputs
-   .. metrics
+   installation
+   tutorial
+   running_a_project
+   inputs
+   metrics
 
 
 Updates & Changelog
