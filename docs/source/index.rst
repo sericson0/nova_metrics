@@ -7,9 +7,7 @@ Welcome to Nova Metrics's documentation!
 ========================================
 **Nova Metrics** provides a workflow for modeling building energy upgrades and producing relevant metrics. 
 
-.. note::
-
-   This project is under active development.
+Note: this project is under active development.
 
 
 .. toctree::
@@ -17,6 +15,10 @@ Welcome to Nova Metrics's documentation!
    :caption: Contents:
    
    tutorial
+   inputs
+   running_a_project
+   metrics
+
 
 
 
