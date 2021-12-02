@@ -32,7 +32,7 @@ release = '0.1'
 # ones.
 extensions = [
 	'sphinx.ext.autodoc',
-	'rst2pdf.pdfbuilder'
+	# 'rst2pdf.pdfbuilder'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -57,5 +57,5 @@ html_theme = 'alabaster'
 html_static_path = ['_static']
 
 
-pdf_documents = [('index', u'Nova Metrics Documentation', u'Nova Metrics', u'Sean Ericson'),]
-pdf_use_index = False
+# pdf_documents = [('index', u'Nova Metrics Documentation', u'Nova Metrics', u'Sean Ericson'),]
+# pdf_use_index = False
