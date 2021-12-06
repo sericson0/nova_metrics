@@ -1,0 +1,33 @@
+
+ {"Scenario": {
+   "Site": {
+   	"latitude": "REPLACE WITH SITE LATITUDE",
+   	"longitude": "REPLACE WITH SITE LONGITUDE",
+  "LoadProfile": {
+    "OPTIONAL ADD HOURLY LOAD PROFILE OR COMMERCIAL REFERENCE BUILDING INFORMATION"
+    },
+   "ElectricTariff": {
+   		"urdb_label": "REPLACE WITH URDB LABEL", 
+   	},
+   	"PV": {
+   		"min_kw": 0,
+   		"max_kw": 1000.0,     "SET TO ZERO IF DEFAULT IS NO SOLAR"
+   		"installed_cost_us_dollars_per_kw":   "ADD SOLAR PRICE", 
+   		"federal_itc_pct": 0.26    "CHANGE DEPENDING ON ITC CREDIT"
+    },
+   	"Storage": {
+   		"min_kwh": 0.0,
+   		"max_kwh": 1000.0,    "SET TO ZERO IF DEFAULT IS NO STORAGE"
+   		"min_kw": 0.0,
+   		"max_kw": 0.0,    "SET TO ZERO IF DEFAULT IS NO STORAGE"
+   		"macrs_option_years": 5,
+   		"installed_cost_us_dollars_per_kwh": 420.0, "CHANGE COSTS BELOW TO BATTERY COSTS"
+   		"installed_cost_us_dollars_per_kw": 840.0,
+   		"replace_cost_us_dollars_per_kwh": 200.0,
+   		"replace_cost_us_dollars_per_kw": 410.0,
+   		"canGridCharge": true                       "SET TO FALSE IF BATTERY CAN ONLY CHARGE FROM PV"
+      }
+    }
+  }
+}
+

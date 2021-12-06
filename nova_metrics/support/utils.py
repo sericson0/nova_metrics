@@ -4,6 +4,14 @@ import pickle
 import numpy as np
 import pandas as pd 
 
+def not_none(val):
+    """Returns False if val is None"""
+    if val == val:
+        return True
+    else:
+         return False
+
+
 def parse_properties(properties_file, **kwargs):
     # Assumes initial file structure, e.g. "city          = CA_RIVERSIDE-MUNI"
     out = {}

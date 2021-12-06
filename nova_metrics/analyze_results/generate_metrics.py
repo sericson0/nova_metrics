@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 pd.set_option('mode.chained_assignment', None)
 from nova_metrics.analyze_results.extract_results import extract_results
+from nova_metrics.support.utils import not_none
 HOURS = 8760
 #%%
 def cover_factor_metrics(results):
@@ -166,7 +167,7 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     return d
 #%%
 #
-def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder, baseline_name, baseline_type, grid_price_path = None):
+def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder, baseline_name, baseline_type, grid_price_path = float("nan")):
     """
     Return dictionary of metrics for single result and single baseline
     
@@ -191,10 +192,10 @@ def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder,
         Dictionary of both zero baseline and comparison metrics.
 
     """
-    if grid_price_path != grid_price_path:
-        grid_prices = []
-    else:
+    if not_none(grid_price_path):
         grid_prices = pd.read_csv(grid_price_path).iloc[:,0].tolist()
+    else:
+        grid_prices = []
     results = extract_results(results_folder, results_name)
     baseline = extract_results(baseline_folder, baseline_name)
     if baseline ["metadata"]["run_failed"] or results["metadata"]["run_failed"]:
@@ -274,9 +275,30 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
 
     """
     Path(metrics_folder).mkdir(parents=True, exist_ok=True)
-    metrics = pd.DataFrame(list(filter(None, [get_reopt_metrics_single_case(os.path.join(reopt_results_folder, inputs["results_folder"][i]), inputs["results_name"][i]+".json", 
-                                                                            os.path.join(reopt_results_folder, inputs["baseline_folder"][i]), inputs["baseline_name"][i]+".json", 
-                                                                            inputs["baseline_type"][i], os.path.join(wholesale_price_folder, inputs["wholesale_price_path"][i])) for i in range(len(inputs))])))
+    
+    metrics_results_list = []
+    for i in range(len(inputs)):
+        if "results_folder" in inputs and not_none(inputs["results_folder"][i]):
+            results_subfolder = os.path.join(reopt_results_folder, inputs["results_folder"][i])
+        else:
+            results_subfolder = reopt_results_folder
+            
+        if "baseline_folder" in inputs and not_none(inputs["baseline_folder"][i]):
+            baseline_subfolder = os.path.join(reopt_results_folder, inputs["baseline_folder"][i])
+        else:
+            baseline_subfolder = reopt_results_folder
+        
+        if "baseline_type" in inputs and not_none(inputs["baseline_type"][i]):
+            baseline_type = inputs["baseline_type"][i]
+        else:
+            baseline_type = ""
+        if "wholesale_price_path" in inputs and not_none(inputs["wholesale_price_path"][i]):
+            wholesale_price_path = os.path.join(wholesale_price_folder, inputs["wholesale_price_path"][i])
+        else:
+            wholesale_price_path = float("nan")
+        metrics_results_list.append(get_reopt_metrics_single_case(results_subfolder, inputs["results_name"][i]+".json", baseline_subfolder, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
+        
+    metrics = pd.DataFrame(list(filter(None, metrics_results_list)))
     filenames = metrics["filename"].tolist()
     metrics.drop("filename", axis = 1, inplace = True) 
     baseline_type = metrics["baseline_type"].tolist()

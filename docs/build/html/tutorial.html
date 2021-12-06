@@ -34,7 +34,94 @@
             
   <div class="section" id="tutorial">
 <h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
-<p>To Be Added</p>
+<p>This tutorial walks through how to set up the Nova Metrics workflow to create REopt posts, call the REopt API to produce REopt results, and then generate metrics.
+See <a class="reference external" href="https://reopt.nrel.gov/">https://reopt.nrel.gov/</a> for further details on NREL’s REopt optimization tool.</p>
+<p>Let’s create a new folder named <strong>nova_tutorial</strong> to store our test case in.</p>
+<p>The three steps to run the workflow are:</p>
+<ol class="arabic simple">
+<li><p>Create a <em>defaults.json</em> file which serves as a template for all posts.</p></li>
+<li><p>Create an <em>Inputs.xlsx</em> file, where scenario specific attributes are defined.</p></li>
+<li><p>Call the relevant Nova Metrics functions (This will be updated as code progresses).</p></li>
+</ol>
+<div class="section" id="set-defaults">
+<h2>Set Defaults<a class="headerlink" href="#set-defaults" title="Permalink to this headline">¶</a></h2>
+<p>Create a <strong>defaults.json</strong> in the <strong>nova_tutorial</strong> folder. This file contains default inputs for each of the REopt scenarios you will run.
+Any value not specified in <strong>defaults.json</strong> will be given the REopt default. REopt default values can be found at <a class="reference external" href="https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py">https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py</a></p>
+<p>Copy the following inputs into your <strong>defaults.json</strong> file. It includes the following changes to the REopt default values</p>
+<ul class="simple">
+<li><p>Updated PV and Storage costs for recent and potential future cost declines.</p></li>
+<li><p>Added a <cite>URDB label &lt;https://openei.org/wiki/Utility_Rate_Database&gt;</cite> for a Consolidated Edison residential electric tariff rate.</p></li>
+<li><p>Added a load profile.</p></li>
+<li><p>Set the default sizing of solar and storage to zero.</p></li>
+</ul>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+
+        <span class="s2">&quot;Scenario&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;Site&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;latitude&quot;</span><span class="p">:</span> <span class="mf">40.71</span><span class="p">,</span>
+                        <span class="s2">&quot;longitude&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">74.01</span><span class="p">,</span>
+                        <span class="s2">&quot;LoadProfile&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;doe_reference_name&quot;</span><span class="p">:</span> <span class="s2">&quot;RetailStore&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;annual_kwh&quot;</span><span class="p">:</span> <span class="mf">17520.0</span><span class="p">,</span>
+                <span class="s2">&quot;city&quot;</span><span class="p">:</span> <span class="s2">&quot;Baltimore&quot;</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;ElectricTariff&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;urdb_label&quot;</span><span class="p">:</span> <span class="s2">&quot;6112d2875457a3233ef802ce&quot;</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;PV&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;min_kw&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                <span class="s2">&quot;max_kw&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                                <span class="s2">&quot;installed_cost_us_dollars_per_kw&quot;</span><span class="p">:</span> <span class="mf">2300.0</span><span class="p">,</span>
+                                <span class="s2">&quot;federal_itc_pct&quot;</span><span class="p">:</span> <span class="mf">0.26</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;Storage&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;min_kwh&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                <span class="s2">&quot;max_kwh&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                <span class="s2">&quot;min_kw&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                <span class="s2">&quot;max_kw&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                                <span class="s2">&quot;macrs_option_years&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                                <span class="s2">&quot;installed_cost_us_dollars_per_kwh&quot;</span><span class="p">:</span> <span class="mf">300.0</span><span class="p">,</span>
+                                <span class="s2">&quot;installed_cost_us_dollars_per_kw&quot;</span><span class="p">:</span>  <span class="mf">600.0</span><span class="p">,</span>
+                                <span class="s2">&quot;replace_cost_us_dollars_per_kwh&quot;</span><span class="p">:</span>  <span class="mf">175.0</span><span class="p">,</span>
+                                <span class="s2">&quot;replace_cost_us_dollars_per_kw&quot;</span><span class="p">:</span>  <span class="mf">350.0</span><span class="p">,</span>
+                                <span class="s2">&quot;canGridCharge&quot;</span><span class="p">:</span> <span class="n">true</span>
+                        <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Templates for both the <strong>defaults.json</strong> and the <strong>Inputs.xlsx</strong> file can be found in the templates folder at the root of the Nova Metrics folder.</p>
+</div>
+<div class="section" id="inputs-file">
+<h2>Inputs File<a class="headerlink" href="#inputs-file" title="Permalink to this headline">¶</a></h2>
+<p>Copy the Inputs.xlsx template from the <strong>templates</strong> folder found in the Nova Metrics root folder and save in the <strong>nova_tutorial</strong> folder. The inputs file has four sheets:</p>
+<ul class="simple">
+<li><p>File Paths</p></li>
+<li><p>REopt Posts</p></li>
+<li><p>Generate Metrics</p></li>
+<li><p>API Keys</p></li>
+</ul>
+<p>See the Inputs section (TODO figure out how to link sections) for details on inputs for each sheet. The template is set up to compare a home without any system, one with solar PV, and one with PV+storage.</p>
+<p>The only sheet we will change is to the API keys. The <em>pv_watts</em> and <em>reopt</em> keys are the same, and can be obtained from the <a href="#id1"><span class="problematic" id="id2">`</span></a>NREL Developer Network &lt;<a class="reference external" href="https://developer.nrel.gov/signup/">https://developer.nrel.gov/signup/</a>&gt;.
+The <em>urdb</em> key can be obtained <a href="#id3"><span class="problematic" id="id4">`</span></a>here &lt;<a class="reference external" href="https://openei.org/services/api/signup/">https://openei.org/services/api/signup/</a>&gt;.</p>
+</div>
+<div class="section" id="call-functions">
+<h2>Call Functions<a class="headerlink" href="#call-functions" title="Permalink to this headline">¶</a></h2>
+<p>Open a command line and change directories into the nova_metrics folder which contains the <strong>workflow.py</strong> Python script. Now type
+.. code-block:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">workflow</span><span class="o">.</span><span class="n">py</span> <span class="o">&lt;</span><span class="n">path</span> <span class="n">to</span> <span class="n">nova_tutorial</span> <span class="n">folder</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>The path to the nova_tutorial folder can be an absolute path or relative to the folder containing <strong>workflow.py</strong>. Running this command will run the workflow and create several folders in the nova_tutorial folder.</p>
+<ul class="simple">
+<li><p><strong>REopt Posts</strong> REopt input json files.</p></li>
+<li><p><strong>Solar Factors</strong> PV factors for each unique location.</p></li>
+<li><p><strong>REopt Results</strong> REopt output json files.</p></li>
+<li><p><strong>Metrics</strong> contains compiled metrics outputs and csv values of timeseries.</p></li>
+</ul>
+<p>The Metrics.xlsx file contains compiled metrics for each run. See the <em>Metrics</em> section (LINK TO SECTION) for more information.</p>
+</div>
 </div>
 
 
@@ -56,7 +143,12 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#set-defaults">Set Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inputs-file">Inputs File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#call-functions">Call Functions</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="inputs.html">Inputs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="running_a_project.html">Running a Project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="metrics.html">Metrics</a></li>

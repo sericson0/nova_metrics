@@ -32,6 +32,7 @@ release = '0.1'
 # ones.
 extensions = [
 	'sphinx.ext.autodoc',
+	'sphinx.ext.autosectionlabel',
 	# 'rst2pdf.pdfbuilder'
 ]
 
@@ -59,3 +60,5 @@ html_static_path = ['_static']
 
 # pdf_documents = [('index', u'Nova Metrics Documentation', u'Nova Metrics', u'Sean Ericson'),]
 # pdf_use_index = False
+
+autosectionlabel_prefix_document = True

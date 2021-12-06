@@ -7,7 +7,7 @@
    	"land_acres": 10,
   "ElectricTariff": {
       "year": 2019,
-   		"urdb_label": "6112d0d95457a35c66f802c9", 
+   		"urdb_label": "6112d3085457a3fb29f802cc", 
    		"net_metering_limit_kw": 0.0, 
    		"interconnection_limit_kw": 100000000.0},
    	"PV": {

@@ -14,10 +14,11 @@ import pathlib
 from nova_metrics.apiquery.download_pv_watts import download_pv_watts
 # import nova_metrics.apiquery.find_urdb as Find_URDB
 #TODO add water heater and HVAC inputs
-from nova_metrics.support.utils import load_post 
+from nova_metrics.support.utils import load_post, not_none
 from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs
 from nova_metrics.support.logger import log
 #%%
+
 def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "", ochre_output_main_folder = ""):
     """
     Create reopt json posts from input excel sheet in `inputs_folder`/`inputs_file_name`.
@@ -85,6 +86,8 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
     ocher_output_main_folder : str
         path to OCHRE building model output.
     """
+    pathlib.Path(main_output_folder).mkdir(parents=True, exist_ok=True)
+    
     post = copy.deepcopy(defaults)
     file_name = input_vals["post_name"] + ".json"
 
@@ -104,16 +107,19 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         
         
     #Load ochre outputs
-    if ("ochre_folder" in input_vals) and (input_vals["ochre_folder"] == input_vals["ochre_folder"]):
+    if ("ochre_folder" in input_vals) and  not_none(input_vals["ochre_folder"]):
         parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = load_ochre_outputs(os.path.join(ochre_output_main_folder, input_vals["ochre_folder"]))
         
         if "LoadProfile" not in post["Scenario"]["Site"]:
             post["Scenario"]["Site"]["LoadProfile"] = {}
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
                 
-    
-    
-    if "output_subfolder" in input_vals:
+    #Add load profile
+    if ("load_file" in input_vals) and not_none(input_vals["load_file"]):
+        post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(pd.read_csv(input_vals["load_file"]).iloc[:,0])
+        
+        
+    if "output_subfolder" in input_vals and not_none(input_vals["output_subfolder"]):
         output_folder = os.path.join(main_output_folder, input_vals["output_subfolder"])
         pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)
     else:
@@ -135,7 +141,7 @@ def update_post(post, name, val):
         if type(val) is np.int64:
             val = int(val)
             
-        if name in ["post_name", "output_subfolder"]:
+        if name in ["post_name", "output_subfolder", "ochre_folder", "load_file"]:
             pass
         elif name == "description":
             post["Scenario"]["description"] = val
