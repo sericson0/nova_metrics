@@ -15,7 +15,7 @@ Set Defaults
 --------------
 
 Create an empty file in the **nova_tutorial** folder and name it **default_post.json**. This file will contain default inputs for each of the REopt scenarios you will run.
-Any value not specified in **default_post.json** will be given the REopt default. REopt default values can be found `here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_  
+Any value not specified in **default_post.json** will be given the REopt default. REopt default values can be `found here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_  
 
 Copy the following inputs into your **default_post.json** file. It includes the following changes to the REopt default values
 
