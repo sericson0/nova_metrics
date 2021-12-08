@@ -16,9 +16,7 @@ The available run arguments are:
 * --metrics [-m] Generates metrics.
 
 
-Multiple run arguments may be added. Examples of valid commands include  
-
-.. code-block:: bash
+Multiple run arguments may be added. Examples of valid commands include::
 
 	python workflow.py ../ --posts
 	python workflow.py ../ -pr
