@@ -82,9 +82,7 @@ For this tutorial the only sheet we will change is to the API keys.
 
 Run Workflow
 ---------------
-Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type
-
-.. code-block:: console
+Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type::
 
 	python workflow.py <path to nova_tutorial folder> --all
 

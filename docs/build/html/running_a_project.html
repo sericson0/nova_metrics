@@ -34,7 +34,24 @@
             
   <div class="section" id="running-a-project">
 <h1>Running a Project<a class="headerlink" href="#running-a-project" title="Permalink to this headline">¶</a></h1>
-<p>To be added</p>
+<p>The Nova Analysis workflow can be run via the command line. To run the workflow, open the command line and change directory to the <strong>nova_metrics</strong> folder where the <em>workflow.py</em> file resides. The following is how you call the workflow in the command line.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python workflow.py &lt;path to main folder&gt; --&lt;run arguments&gt;
+</pre></div>
+</div>
+<p>The &lt;path to main folder&gt; is an absolute or relative path to where the input files reside and the outputs will be saved to.</p>
+<p>The available run arguments are:</p>
+<ul class="simple">
+<li><p>–all [-a] Runs full workflow.</p></li>
+<li><p>–posts [-p] Creates REopt posts.</p></li>
+<li><p>–reopt [-r] Runs REopt for each post.</p></li>
+<li><p>–metrics [-m] Generates metrics.</p></li>
+</ul>
+<p>Multiple run arguments may be added. Examples of valid commands include</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python workflow.py ../ --posts
+python workflow.py ../ -pr
+python workflow.py ../ --reopt --metrics
+</pre></div>
+</div>
 </div>
 
 
