@@ -79,7 +79,7 @@ See the Inputs section (TODO figure out how to link sections) for details on inp
 For this tutorial the only sheet we will change is to the API keys. 
 
 * The *pv_watts* and *reopt* keys are the same, and can be obtained from the `NREL Developer Network <https://developer.nrel.gov/signup/>`_.
-* The *urdb* key can be obtained `here <https://openei.org/services/api/signup/>. 
+* The *urdb* key can be obtained `here <https://openei.org/services/api/signup/>`_. 
 
 Run Workflow
 ---------------
