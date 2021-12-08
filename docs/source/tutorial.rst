@@ -3,21 +3,20 @@ Tutorial
 This tutorial walks through how to set up the Nova Metrics workflow to create REopt posts, call the REopt API to produce REopt results, and then generate metrics.
 See https://reopt.nrel.gov/ for further details on NREL's REopt optimization tool.
 
-Let's create a new folder named **nova_tutorial** to store our test case in. 
+To begin, create a new folder named **nova_tutorial** where we will store the results of this tutorial. 
 
 The three steps to run the workflow are:
 
-#. Create a *defaults.json* file which serves as a template for all posts.
+#. Create a *default_post.json* file which serves as a template for all posts.
 #. Create an *Inputs.xlsx* file, where scenario specific attributes are defined.
-#. Call the relevant Nova Metrics functions (This will be updated as code progresses).
-
+#. Run the workflow.
 Set Defaults
 --------------
 
-Create a **defaults.json** in the **nova_tutorial** folder. This file contains default inputs for each of the REopt scenarios you will run.
-Any value not specified in **defaults.json** will be given the REopt default. REopt default values can be found at https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py  
+Create an empty file in the **nova_tutorial** folder and name it **default_post.json**. This file will contain default inputs for each of the REopt scenarios you will run.
+Any value not specified in **default_post.json** will be given the REopt default. REopt default values can be found at https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py  
 
-Copy the following inputs into your **defaults.json** file. It includes the following changes to the REopt default values
+Copy the following inputs into your **default_post.json** file. It includes the following changes to the REopt default values
 
 * Updated PV and Storage costs for recent and potential future cost declines. 
 * Added a `URDB label <https://openei.org/wiki/Utility_Rate_Database>` for a Consolidated Edison residential electric tariff rate. 
@@ -62,12 +61,12 @@ Copy the following inputs into your **defaults.json** file. It includes the foll
 		}
 	}
 
-Templates for both the **defaults.json** and the **Inputs.xlsx** file can be found in the templates folder at the root of the Nova Metrics folder. 
+Templates for both the **default_post.json** and the **Inputs.xlsx** file can be found in the templates folder at the root of the Nova Metrics folder. 
 
 Inputs File
 ------------
 
-Copy the Inputs.xlsx template from the **templates** folder found in the Nova Metrics root folder and save in the **nova_tutorial** folder. The inputs file has four sheets: 
+Navigate to the **templates** folder found in the root folder of nova_metrics. Copy the Inputs.xlsx template from and save the copy back in the **nova_tutorial** folder. The inputs file has four sheets: 
 
 * File Paths
 * REopt Posts
@@ -76,12 +75,15 @@ Copy the Inputs.xlsx template from the **templates** folder found in the Nova Me
 
 See the Inputs section (TODO figure out how to link sections) for details on inputs for each sheet. The template is set up to compare a home without any system, one with solar PV, and one with PV+storage.
 
-The only sheet we will change is to the API keys. The *pv_watts* and *reopt* keys are the same, and can be obtained from the `NREL Developer Network <https://developer.nrel.gov/signup/>.
-The *urdb* key can be obtained `here <https://openei.org/services/api/signup/>. 
+For this tutorial the only sheet we will change is to the API keys. 
 
-Call Functions
+* The *pv_watts* and *reopt* keys are the same, and can be obtained from the `NREL Developer Network <https://developer.nrel.gov/signup/>.
+* The *urdb* key can be obtained `here <https://openei.org/services/api/signup/>. 
+
+Run Workflow
 ---------------
 Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type
+
 .. code-block:: 
 	python workflow.py <path to nova_tutorial folder>
 

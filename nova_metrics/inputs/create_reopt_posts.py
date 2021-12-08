@@ -11,11 +11,10 @@ import json
 import copy
 # import collections.abc
 import pathlib
-from nova_metrics.apiquery.download_pv_watts import download_pv_watts
 # import nova_metrics.apiquery.find_urdb as Find_URDB
 #TODO add water heater and HVAC inputs
 from nova_metrics.support.utils import load_post, not_none
-from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs
+from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs, get_pv_prod_factor
 from nova_metrics.support.logger import log
 #%%
 
@@ -93,18 +92,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
 
     
     if add_pv_prod_factor:
-        if "latitude" in input_vals:
-            latitude = input_vals["latitude"]
-            longitude = input_vals["longitude"]
-        else:
-            latitude = post["Scenario"]["Site"]["latitude"]
-            longitude = post["Scenario"]["Site"]["longitude"]
-        pv_prod_factor_csv_file_path = os.path.join(solar_profile_folder, f"PVproductionFactor_{latitude}_{longitude}.csv")
-        if not os.path.isfile(pv_prod_factor_csv_file_path):
-            download_pv_watts(pv_prod_factor_csv_file_path, pv_watts_api_key, latitude, longitude)
-            
-        post["Scenario"]["Site"]["PV"]["prod_factor_series_kw"] = list(pd.read_csv(pv_prod_factor_csv_file_path, header=None).iloc[:,0])    
-        
+        post["Scenario"]["Site"]["PV"]["prod_factor_series_kw"] = get_pv_prod_factor(input_vals, solar_profile_folder, post, pv_watts_api_key)
         
     #Load ochre outputs
     if ("ochre_folder" in input_vals) and  not_none(input_vals["ochre_folder"]):
@@ -141,7 +129,7 @@ def update_post(post, name, val):
         if type(val) is np.int64:
             val = int(val)
             
-        if name in ["post_name", "output_subfolder", "ochre_folder", "load_file"]:
+        if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file"]:
             pass
         elif name == "description":
             post["Scenario"]["description"] = val
