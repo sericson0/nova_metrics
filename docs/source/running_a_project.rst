@@ -2,7 +2,7 @@ Running a Project
 --------------------
 The Nova Analysis workflow can be run via the command line. To run the workflow, open the command line and change directory to the **nova_metrics** folder where the *workflow.py* file resides. The following is how you call the workflow in the command line.
 
-.. code-block:: 
+.. code-block:: bash
 
 	python workflow.py <path to main folder> --<run arguments> 
 
@@ -18,7 +18,7 @@ The available run arguments are:
 
 Multiple run arguments may be added. Examples of valid commands include  
 
-.. code-block:: 
+.. code-block:: bash
 
 	python workflow.py ../ --posts
 	python workflow.py ../ -pr
