@@ -1,5 +1,5 @@
 Inputs
-------------
+==================
 Inputs which are constant for all runs are specified in the **default_post.json** file. A **default_post** template can be found at the root of the Nova Metrics folder. Any input which is not specified at all uses the REopt default. REopt defaults can be found `Here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_. 
 
 The Inputs.xlsx file defines scenario-specific inputs and determines what comparison metrics will be calculated. The Inputs.xlsx has **N** Sheets (Update when OCHRE and ResStock are integrated).
@@ -10,7 +10,7 @@ The Inputs.xlsx file defines scenario-specific inputs and determines what compar
 * **API Keys**  User adds API keys to query various programs and data sets. 
 
 File Paths
-^^^^^^^^^^^^^^
+----------------
 Most file paths are relative to the *main_folder*. The folder *timeseries_output_folder* is relative to the *metrics_folder*. The workflow will create folders as necessary so the user does not need to create the folder structure ahead of time. The following is the list of folder paths:
 
 * **reopt_posts** Folder to save REopt posts. 
@@ -21,7 +21,7 @@ Most file paths are relative to the *main_folder*. The folder *timeseries_output
 * **metrics_folder** Folder to store metrics outputs. 
 
 REopt Posts
-^^^^^^^^^^^^^^
+------------------
 The *REopt Posts* sheet specifies inputs for REopt post json files. he only required input is **post_name**. All other inputs are optional. Rows signify a single post while columns signify inputs for that post. Input columns are divided into two components: special inputs and post inputs. 
 
 Special inputs include the following:
@@ -34,12 +34,13 @@ Special inputs include the following:
 * **solar_production_factor_file** Specifies path to a csv file which contains PV production factors. PV production is on first column with no header. If no path is specified then will use value from PV watts. 
 
 :: 
+
 	Post inputs will insert the value directly into the REopt post. The REopt post has a nested structure of the form Scenario[Site][<Capital nested input>][<lower-case nested input>][input value]. Inputs from the *REopt Posts* sheet are inserted into Scenario[Site]. The symbol | is parsed to signify a nested input. For example, to input a value for PV max_kw, located at Scenario[Site][PV][max_kw], then specify the column name as PV|max_kw. Blank input values are ignored.  
 
 
 
 Generate Metrics
-^^^^^^^^^^^^^^^^^^
+-------------------------
 The *Generate Metrics* sheet specifies the results and baseline comparison for metrics calculations. The columns are specified as follows:
 
 * **results_folder** Subfolder relative to *reopt_results* main folder. Only applies if *output_subfolders* were specified in the *REopt posts* sheet. 

@@ -1,5 +1,5 @@
 Tutorial
-========
+=========
 This tutorial walks through how to set up the Nova Metrics workflow to create REopt posts, call the REopt API to produce REopt results, and then generate metrics.
 See https://reopt.nrel.gov/ for further details on NREL's REopt optimization tool.
 
@@ -10,6 +10,7 @@ The three steps to run the workflow are:
 #. Create a *default_post.json* file which serves as a template for all posts.
 #. Create an *Inputs.xlsx* file, where scenario specific attributes are defined.
 #. Run the workflow.
+
 Set Defaults
 --------------
 
@@ -61,12 +62,6 @@ Copy the following inputs into your **default_post.json** file. It includes the 
 		}
 	}
 
-Test code block 
-
-.. code-block:: 
-
-	python workflow.py 
-
 Templates for both the **default_post.json** and the **Inputs.xlsx** file can be found in the templates folder at the root of the Nova Metrics folder. 
 
 Inputs File
@@ -88,9 +83,9 @@ For this tutorial the only sheet we will change is to the API keys.
 
 Run Workflow
 ---------------
-Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type::
+Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type
 
-	python workflow.py <path to nova_tutorial folder> --all
+python workflow.py <path to nova_tutorial folder> --all
 
 The path to the nova_tutorial folder can be an absolute path or relative to the folder containing **workflow.py**. Running this command will run the workflow and create several folders in the nova_tutorial folder. See *Running a Project* Section (LINK TO SECTION) for more information on how to run parts of workflow.
 
