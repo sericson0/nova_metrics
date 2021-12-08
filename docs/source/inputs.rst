@@ -1,10 +1,10 @@
 Inputs
 ------------
-Inputs which are constant for all runs are specified in the **default_post.json** file. A **default_post** template can be found at the root of the Nova Metrics folder. Any input which is not specified at all uses the REopt default. REopt defaults can be found `Here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`. 
+Inputs which are constant for all runs are specified in the **default_post.json** file. A **default_post** template can be found at the root of the Nova Metrics folder. Any input which is not specified at all uses the REopt default. REopt defaults can be found `Here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_. 
 
 The Inputs.xlsx file defines scenario-specific inputs and determines what comparison metrics will be calculated. The Inputs.xlsx has **N** Sheets (Update when OCHRE and ResStock are integrated).
 
-* **File Paths** Defines folder structure for main inputs and outputs 
+* **File Paths** Defines folder structure for main inputs and outputs. 
 * **REopt Posts** Each column sets a REopt input and each row specifies a post.
 * **Generate Metrics** Specifies run and baseline for metric calculations.
 * **API Keys**  User adds API keys to query various programs and data sets. 
@@ -13,9 +13,9 @@ File Paths
 ^^^^^^^^^^^^^^
 Most file paths are relative to the *main_folder*. The folder *timeseries_output_folder* is relative to the *metrics_folder*. The workflow will create folders as necessary so the user does not need to create the folder structure ahead of time. The following is the list of folder paths:
 
-* **reopt_posts** Folder to save REopt posts. *output_subfolder* specified in *REopt Posts* sheet can create nested subfolders in **reopt_posts** folder.   
-* **reopt_results** Folder where REopt output json files are saved. Takes same nested subfolder structure as specified when creating REopt posts. 
-* **timeseries_output_folder** Folder to store timeseries csv files for each run. folder path is relative to *metrics_folder*. 
+* **reopt_posts** Folder to save REopt posts. 
+* **reopt_results** Folder where REopt output json files are saved. 
+* **timeseries_output_folder** Folder to store timeseries csv files for each run. Folder path is relative to *metrics_folder*. 
 * **solar_profile_folder** Folder to store PV watts production factor outputs.
 * **default_values_file** Path (including file name) to *default_post.json*.
 * **metrics_folder** Folder to store metrics outputs. 

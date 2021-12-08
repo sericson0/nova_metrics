@@ -14,12 +14,12 @@ Set Defaults
 --------------
 
 Create an empty file in the **nova_tutorial** folder and name it **default_post.json**. This file will contain default inputs for each of the REopt scenarios you will run.
-Any value not specified in **default_post.json** will be given the REopt default. REopt default values can be found at https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py  
+Any value not specified in **default_post.json** will be given the REopt default. REopt default values can be found `here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_  
 
 Copy the following inputs into your **default_post.json** file. It includes the following changes to the REopt default values
 
 * Updated PV and Storage costs for recent and potential future cost declines. 
-* Added a `URDB label <https://openei.org/wiki/Utility_Rate_Database>` for a Consolidated Edison residential electric tariff rate. 
+* Added a `URDB label <https://openei.org/wiki/Utility_Rate_Database>`_ for a Consolidated Edison residential electric tariff rate. 
 * Added a load profile. 
 * Set the default sizing of solar and storage to zero.  
 
@@ -77,7 +77,7 @@ See the Inputs section (TODO figure out how to link sections) for details on inp
 
 For this tutorial the only sheet we will change is to the API keys. 
 
-* The *pv_watts* and *reopt* keys are the same, and can be obtained from the `NREL Developer Network <https://developer.nrel.gov/signup/>.
+* The *pv_watts* and *reopt* keys are the same, and can be obtained from the `NREL Developer Network <https://developer.nrel.gov/signup/>`_.
 * The *urdb* key can be obtained `here <https://openei.org/services/api/signup/>. 
 
 Run Workflow
