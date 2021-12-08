@@ -61,6 +61,12 @@ Copy the following inputs into your **default_post.json** file. It includes the 
 		}
 	}
 
+Test code block 
+
+.. code-block:: 
+
+	python workflow.py 
+
 Templates for both the **default_post.json** and the **Inputs.xlsx** file can be found in the templates folder at the root of the Nova Metrics folder. 
 
 Inputs File
