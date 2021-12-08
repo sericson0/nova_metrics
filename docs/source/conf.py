@@ -32,7 +32,6 @@ release = '0.1'
 # ones.
 extensions = [
 	'sphinx.ext.autodoc',
-	'sphinx.ext.autosectionlabel',
 	# 'rst2pdf.pdfbuilder'
 ]
 
