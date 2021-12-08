@@ -85,14 +85,14 @@ Run Workflow
 Open a command line and change directories into the nova_metrics folder which contains the **workflow.py** Python script. Now type
 
 .. code-block:: 
-	python workflow.py <path to nova_tutorial folder>
+	python workflow.py <path to nova_tutorial folder> --all
 
-The path to the nova_tutorial folder can be an absolute path or relative to the folder containing **workflow.py**. Running this command will run the workflow and create several folders in the nova_tutorial folder.
+The path to the nova_tutorial folder can be an absolute path or relative to the folder containing **workflow.py**. Running this command will run the workflow and create several folders in the nova_tutorial folder. See *Running a Project* Section (LINK TO SECTION) for more information on how to run parts of workflow.
 
 * **REopt Posts** REopt input json files.
 * **Solar Factors** PV factors for each unique location. 
 * **REopt Results** REopt output json files.
 * **Metrics** contains compiled metrics outputs and csv values of timeseries. 
 
-The Metrics.xlsx file contains compiled metrics for each run. See the *Metrics* section (LINK TO SECTION) for more information. 
+The Metrics.xlsx file contains compiled metrics for each run. See the *Metrics* Section (LINK TO SECTION) for more information. 
 
