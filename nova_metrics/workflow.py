@@ -16,7 +16,7 @@ def main():
     parser.add_argument("-p", "--posts", action="store_true", help = "Generate REopt posts.")
     parser.add_argument("-r", "--reopt", action="store_true", help = "Run REopt for each generated post")
     parser.add_argument("-m", "--metrics", action="store_true", help = "Generate metrics.")
-    parser.add_argument("-a", "--all", action="store_true", "Run full workflow.")
+    parser.add_argument("-a", "--all", action="store_true", help = "Run full workflow.")
     
     args = parser.parse_args()
     
@@ -24,7 +24,7 @@ def main():
     os.chdir(args.main_folder)
     main_folder = "./"
     
-    inputs_file_name = "Inputs.xlsx"
+    inputs_file_name = "./single_load/Inputs.xlsx"
     inputs_file = os.path.join(main_folder, inputs_file_name)
 
 
