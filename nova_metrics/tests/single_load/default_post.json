@@ -25,7 +25,7 @@
 			"federal_itc_pct": 0.26,
 			"array_type": 1,
 			"tilt": 10,
-			"can_curtail": true
+			"can_curtail": false
 		},
 		"Storage": {
 			"min_kwh": 0.0,
