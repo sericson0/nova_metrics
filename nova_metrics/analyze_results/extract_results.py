@@ -186,7 +186,7 @@ def temperature_values(reopt_results):
         return {'temperatures_degree_C': [None]*HOURS, 'comfort_penalty': [0]*HOURS, "outdoor_air_temp_degF": [None]*HOURS}
 #%%
 def emissions_values(reopt_results):
-    return {"annual_emissions_lb_CO2": reopt_results["outputs"]["Scenario"]["Site"]["year_one_emissions_lb_C02"],
+    return {"annual_emissions_lb_CO2": reopt_results["outputs"]["Scenario"]["Site"]["year_one_emissions_tCO2"],
             "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]}
 
 #%%
