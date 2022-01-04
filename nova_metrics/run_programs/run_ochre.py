@@ -2,14 +2,18 @@
 # sys.path.insert(1, './ochre/ochre')
 import os
 # from shutil import copyfile
-# import pandas as pd
-# import datetime as dt
+import pandas as pd
+import datetime as dt
 # from ochre import Dwelling
 from pathlib import Path
 os.chdir(os.path.dirname(__file__))
+from ochre import Dwelling
+from ochre import CreateFigures
+from ochre.FileIO import default_input_path
 # from nova_metrics.apiquery.download_nsrdb import download_nsrdb
 #%%
-def run_ochre(inputs_folder, results_folder, properties_ext = '_rc_model.properties', schedule_ext = '_schedule.properties'):
+def run_ochre(inputs_folder, results_folder, ochre_weather_file = "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip", 
+              properties_ext = '_rc_model.properties', schedule_ext = '_schedule.properties'):
     """
     Runs OCHRE model for each building in `inputs_folder` and saves results to `results_folder`
     
@@ -26,7 +30,8 @@ def run_ochre(inputs_folder, results_folder, properties_ext = '_rc_model.propert
     folder_paths = [f[0] for f in os.walk(inputs_folder) if len(f[2]) > 0] #Gets subdirectories which contain files
     
     for location_path in folder_paths:
-        ochre_weather_file = "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip"
+        Path(location_path).mkdir(parents=True, exist_ok=True)
+        
         ##TODO setup optional download from nsrdb
         
         # download_nsrdb(ochre_weather_file, location_vals["latitude"], location_vals["longitude"], api_keys["nrel_api_key"])
@@ -34,13 +39,10 @@ def run_ochre(inputs_folder, results_folder, properties_ext = '_rc_model.propert
         properties_file = os.path.join(location_path, properties_ext)
         schedule_file = os.path.join(location_path, schedule_ext)
 
-
-        ochre_rate_file = os.path.join(location_inputs_folder, building, ' Rate.csv')
-        ochre_water_draw_file = os.path.join(location_inputs_folder, building, building + "_water_file.csv")
+        # ochre_rate_file = os.path.join(location_inputs_folder, building, ' Rate.csv')
+        # ochre_water_draw_file = os.path.join(location_inputs_folder, building, building + "_water_file.csv")
         
-        
-        
-        
+        run_ochre_single_case(simulation_name, properties_file, schedule_file, weather_path, default_input_path, output_folder)
         
         
         
@@ -48,7 +50,6 @@ def run_ochre(inputs_folder, results_folder, properties_ext = '_rc_model.propert
         results_dir = os.path.join(results_folder, directory)
         results_file = os.path.join(results_folder, directory, post_name)
         
-        Path(results_dir).mkdir(parents=True, exist_ok=True)
 
         if not os.path.isfile(results_file):
             print("Running REopt for", post_name)
@@ -62,9 +63,12 @@ def run_ochre(inputs_folder, results_folder, properties_ext = '_rc_model.propert
 
 inputs_folder = "C:/Users/sean/Dropbox/NREL Work/Year 2020/NOVA/Coding Framework/V0.1/Testing Runs/OCHRE Inputs"
 
-
-
-
+folder_paths = [Path(f[0]) for f in os.walk(inputs_folder) if len(f[2]) > 0] #Gets subdirectories which contain files
+Path(results_dir).mkdir(parents=True, exist_ok=True)
+path_list = [path.relative_to(inputs_folder) for path in folder_paths]  
+for path in path_list:
+    directory, post_name = os.path.split(path)
+    print(directory, post_name)
 
 
 
@@ -73,7 +77,62 @@ inputs_folder = "C:/Users/sean/Dropbox/NREL Work/Year 2020/NOVA/Coding Framework
 list(Path("C:/Users/sean/Dropbox/NREL Work/Year 2020/NOVA/Coding Framework/V0.1/Testing Runs/OCHRE Inputs").glob("**"))
 
 
+def run_ochre_single_case(simulation_name, properties_file, schedule_file, weather_path, default_input_path, output_folder):
+    dwelling_args = {
+    # Timing parameters
+    'start_time': dt.datetime(2018, 1, 1, 0, 0),  # year, month, day, hour, minute
+    'time_res': dt.timedelta(minutes=10),
+    'duration': dt.timedelta(days=3),
+    'initialization_time': dt.timedelta(days=1),
 
+    # Input parameters - Sample building
+    # 'input_path': default_input_path,
+    # 'properties_file': os.path.join(default_input_path, 'Properties Files', 'sample_resstock_house.xml'),
+    # 'schedule_file': os.path.join(default_input_path, 'Schedule Files', 'sample_resstock_schedule.csv'),
+
+    # Input parameters - ResStock
+    'input_path': default_input_path,
+    'properties_file': properties_file, 
+    'schedule_file': schedule_file,
+    # 'weather_path': weather_path,
+
+    # Output parameters
+    'save_results': True,
+    'output_path': output_folder,
+    'export_res': dt.timedelta(days=61),
+    'verbosity': 9,  # verbosity of results file (1-9)
+
+    # 'ext_time_res': dt.timedelta(minutes=15),
+    'save_matrices': True,
+    'show_eir_shr': True,
+    }
+    dwelling = Dwelling(simulation_name, **dwelling_args)
+    df, metrics, hourly = dwelling.simulate()
+    
+    
+    
+    
+simulation_name = "test"
+properties_file = os.path.join(default_input_path, 'Properties Files', 'sample_resstock_house.xml')
+schedule_file = os.path.join(default_input_path, 'Schedule Files', 'sample_resstock_schedule.csv')
+weather_path = "C:/Users/sean/Dropbox/NREL Work/Year 2020/NOVA/Coding Framework/V0.1/Data/BuildStock_TMY3_FIPS.zip"
+output_folder = "C:/Users/sean/Desktop/TestOchre"
+
+run_ochre_single_case(simulation_name, properties_file, schedule_file, weather_path, default_input_path, output_folder)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 def run_ochre(main_folder, inputs, api_keys = {}, overwrite_files = False):
