@@ -73,7 +73,15 @@ def storage_values(reopt_results):
 def financial_values(reopt_results):
     """Return dictionary of financial values including LCC, net capital costs, and initial capital costs"""
     outputs = reopt_results["outputs"]["Scenario"]["Site"]["Financial"]
-    return {"LCC": outputs["lcc_us_dollars"], "net_capital_costs": outputs["net_capital_costs"], "initial_capital_costs": outputs["initial_capital_costs"]}
+    
+    d = {
+        "LCC": outputs["lcc_us_dollars"],
+        "net_capital_costs": outputs["net_capital_costs"],
+        "initial_capital_costs": outputs["initial_capital_costs"],
+        "total_om_cost": outputs["total_om_cost_us_dollars"],
+        "total_production_incentive_benefit": outputs["total_production_incentive_after_tax"]        
+        }
+    return d
 #%%
 def load_values(reopt_results):
     """Return dictionary of load values including `home_load`, `net_load`, and `grid_purchases`."""
@@ -133,12 +141,19 @@ def utility_bill(reopt_results):
     outputs = reopt_results["outputs"]["Scenario"]["Site"]["ElectricTariff"]
     
     d = {"annual_bill": outputs["year_one_bill_us_dollars"], 
-         "energy": outputs["year_one_energy_cost_us_dollars"], 
-         "demand_charges": outputs["year_one_demand_cost_us_dollars"],
-         "export_benefits": outputs["year_one_export_benefit_us_dollars"],
+         "total_utility_energy_cost": outputs["year_one_energy_cost_us_dollars"], 
+         "total_fuel_cost": reopt_results["outputs"]["Scenario"]["Site"]["FuelTariff"]["total_fuel_cost_us_dollars"],
+         
+         "total_utility_demand_cost": outputs["year_one_demand_cost_us_dollars"],
          "total_energy": outputs["total_energy_cost_us_dollars"],
          "energy_costs_per_kwh" : outputs["year_one_energy_cost_series_us_dollars_per_kwh"],
-         "demand_charge_per_kw": outputs["year_one_demand_cost_series_us_dollars_per_kw"]}
+         "demand_charge_per_kw": outputs["year_one_demand_cost_series_us_dollars_per_kw"],
+         "total_utility_fixed_cost": outputs["total_fixed_cost_us_dollars"],
+         "total_utility_min_cost_adder_cost": outputs["total_min_charge_adder_us_dollars"],
+         "total_utility_coincident_peak_cost": outputs["total_coincident_peak_cost_us_dollars"],
+         "total_export_benefit": outputs["total_export_benefit_us_dollars"],
+         "total_resource_adequacy_benefit": outputs["total_resource_adequacy_benefit"]
+         }
     return d
     
 #%%
@@ -186,9 +201,29 @@ def temperature_values(reopt_results):
         return {'temperatures_degree_C': [None]*HOURS, 'comfort_penalty': [0]*HOURS, "outdoor_air_temp_degF": [None]*HOURS}
 #%%
 def emissions_values(reopt_results):
-    return {"annual_emissions_lb_CO2": reopt_results["outputs"]["Scenario"]["Site"]["year_one_emissions_tCO2"],
-            "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]}
+    outputs = reopt_results["outputs"]["Scenario"]["Site"]
+    d = {
+        "annual_emissions_lb_CO2": outputs["year_one_emissions_tCO2"],
+        "hourly_emissions_factors_lb_CO2_per_kwh": outputs["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]
+        }
+    if reopt_results["inputs"]["Scenario"]["Site"]["include_climate_in_objective"]:
+        d["total_climate_cost"] = outputs["lifecycle_emissions_cost_CO2"]
+    else:
+        d["total_climate_cost"] = 0
+    if reopt_results["inputs"]["Scenario"]["Site"]["include_health_in_objective"]:
+        d["total_health_cost"] = outputs["lifecycle_emissions_cost_Health"]
+    else:
+        d["total_health_cost"] = 0
+        
+    return d 
 
+#%%
+def comfort_values(reopt_results):
+    outputs = reopt_results["outputs"]["Scenario"]["Site"]["RC"]
+    d = {
+    "total_wh_comfort_cost": outputs["wh_comfort_cost_total"],
+    "total_hvac_comfort_cost": outputs["hvac_comfort_cost_total"]}
+    return d
 #%%
 def metadata_values(reopt_results, filename):
     d = {}
@@ -230,4 +265,5 @@ def extract_results(filepath, filename):
         d["emissions"] = emissions_values(reopt_results)
         
         d["resilience"] = resilience_values(reopt_results, d["load"]["home_load"])
+        d["comfort"] = comfort_values(reopt_results)
         return d 

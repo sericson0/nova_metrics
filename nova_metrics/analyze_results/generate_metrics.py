@@ -100,7 +100,7 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["ERWH-kw_capacity"] = results["FlexTechHPWH"]["kw_capacity"]
     d["ERWH-upfront_capital_cost"] = results["FlexTechHPWH"]["upfront_capital_cost"]
     
-    d["Home-annual_comfort_penalty"] = sum(results["temperature"]["comfort_penalty"])
+    d["Home-annual_comfort_penalty_dollars"] = sum(results["temperature"]["comfort_penalty"])
     
     d["Financial-lcc"] = results["financial"]["LCC"] 
     d["Financial-net_capital_costs"] = results["financial"]["net_capital_costs"]
@@ -112,14 +112,33 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["External-annual_grid_purchases_kwh"] = results["load"]["annual_grid_purchases"] 
     
     d["Financial-annual_bill"] = results["utility_bill"]["annual_bill"]
-    d["Financial-annual_energy_bill"] = results["utility_bill"]["energy"]
-    d["Financial-annual_demand_charges"] = results["utility_bill"]["demand_charges"]
+    d["Financial-annual_energy_bill"] = results["utility_bill"]["total_utility_energy_cost"]
+    d["Financial-annual_demand_charges"] = results["utility_bill"]["total_utility_demand_cost"]
     
     d["External-annual_emissions_lb_CO2"] = results["emissions"]["annual_emissions_lb_CO2"]
     d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
     
     d["Home-ra_battery_capacity"] = min(results["Storage"]["kw_capacity"], (results["Storage"]["kwh_capacity"]*0.936*0.8) / 4.0) #Discharge efficiency 0.936, min SOC 0.2, event duration = 4 
     d["Home-avg_resilience_hours"] = results["resilience"]["avg_resilience_no_notice"]
+    
+    d["LCC Breakdown-lcc"] = results["financial"]["LCC"] 
+    d["LCC Breakdown-total_capex_and_replacement_cost"] = results["financial"]["net_capital_costs"]
+    d["LCC Breakdown-total_om_cost"] = results["financial"]["total_om_cost"]
+    d["LCC Breakdown-total_fuel_cost"] = results["financial"]["total_fuel_cost"]
+    d["LCC Breakdown-total_utility_energy_cost"] = results["financial"]["total_utility_energy_cost"]
+    d["LCC Breakdown-total_utility_demand_cost"] = results["financial"]["total_utility_demand_cost"]
+    
+    d["LCC Breakdown-total_total_utility_fixed_cost"] = results["financial"]["total_utility_fixed_cost"]
+    d["LCC Breakdown-total_utility_min_cost_adder_cost"] = results["financial"]["total_utility_min_cost_adder_cost"]
+    d["LCC Breakdown-total_utility_coincident_peak_cost"] = results["financial"]["total_utility_coincident_peak_cost"]
+    d["LCC Breakdown-total_export_benefit"] = results["financial"]["total_export_benefit"]
+    d["LCC Breakdown-total_production_incentive_benefit"] = results["financial"]["total_production_incentive_benefit"]
+    d["LCC Breakdown-total_climate_cost"] = results["financial"]["total_climate_cost"]
+    d["LCC Breakdown-total_health_cost "] = results["financial"]["total_health_cost"]
+    d["LCC Breakdown-total_resource_adequacy_benefit"] = results["financial"]["total_resource_adequacy_benefit"]
+    d["LCC Breakdown-wh_comfort_cost_total"] = results["comfort"]["total_wh_comfort_cost"]
+    d["LCC Breakdown-total_hvac_comfort_cost"] = results["comfort"]["total_hvac_comfort_cost"]
+    
     
     cf_metrics = cover_factor_metrics(results)
     for key in cf_metrics:
@@ -157,7 +176,7 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     
     d["External-emission_reductions"] = baseline["emissions"]["annual_emissions_lb_CO2"] - results["emissions"]["annual_emissions_lb_CO2"]
     
-    d["Home-comfort_change"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
+    d["Home-comfort_change_dollars"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
     
     d["External-max_grid_purchase_change_kw"] = max(baseline["load"]["grid_purchases_kw"]) - max(results["load"]["grid_purchases_kw"])
     d["Home-change_in_avg_hourly_ra"] = results["ra"]["avg_hourly_ra_reduction"] - baseline["ra"]["avg_hourly_ra_reduction"]
