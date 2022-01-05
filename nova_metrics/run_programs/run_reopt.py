@@ -78,7 +78,7 @@ def poller(url, poll_interval):
 #%%
 
 
-def run_reopt(post_folder, results_folder, api_key, root_url = 'https://developer.nrel.gov/api/reopt', poll_interval = 10):
+def run_reopt(post_folder, results_folder, api_key, root_url = 'https://developer.nrel.gov/api/reopt', overwrite = True, poll_interval = 10):
     """
     Runs REopt posts in `post_folder` and saves results to `results_folder`
     
@@ -110,7 +110,7 @@ def run_reopt(post_folder, results_folder, api_key, root_url = 'https://develope
         
         Path(results_dir).mkdir(parents=True, exist_ok=True)
 
-        if not os.path.isfile(results_file):
+        if (not os.path.isfile(results_file)) or overwrite:
             print("Running REopt for", post_name)
             post = load_post(post_dir, post_name)
             reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
