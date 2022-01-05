@@ -335,7 +335,7 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
         d[b] = df
     ##
     with pd.ExcelWriter(os.path.join(metrics_folder, metrics_results_file_name)) as writer:
-        for sheet_name in ["Run Type", "Financial", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
+        for sheet_name in ["Run Type", "Financial", "LCC Breakdown", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
             d[sheet_name].to_excel(writer, sheet_name = sheet_name, index = False)
 #%%
 def generate_timeseries(reopt_results_folder, timeseries_output_folder):
