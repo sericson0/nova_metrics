@@ -100,7 +100,7 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["ERWH-kw_capacity"] = results["FlexTechHPWH"]["kw_capacity"]
     d["ERWH-upfront_capital_cost"] = results["FlexTechHPWH"]["upfront_capital_cost"]
     
-    d["Home-annual_comfort_penalty"] = sum(results["temperature"]["comfort_penalty"])
+    d["Home-annual_comfort_penalty_dollars"] = sum(results["temperature"]["comfort_penalty"])
     
     d["Financial-lcc"] = results["financial"]["LCC"] 
     d["Financial-net_capital_costs"] = results["financial"]["net_capital_costs"]
@@ -112,14 +112,32 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["External-annual_grid_purchases_kwh"] = results["load"]["annual_grid_purchases"] 
     
     d["Financial-annual_bill"] = results["utility_bill"]["annual_bill"]
-    d["Financial-annual_energy_bill"] = results["utility_bill"]["energy"]
-    d["Financial-annual_demand_charges"] = results["utility_bill"]["demand_charges"]
+    d["Financial-annual_energy_bill"] = results["utility_bill"]["total_utility_energy_cost"]
+    d["Financial-annual_demand_charges"] = results["utility_bill"]["total_utility_demand_cost"]
     
     d["External-annual_emissions_lb_CO2"] = results["emissions"]["annual_emissions_lb_CO2"]
     d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
     
     d["Home-ra_battery_capacity"] = min(results["Storage"]["kw_capacity"], (results["Storage"]["kwh_capacity"]*0.936*0.8) / 4.0) #Discharge efficiency 0.936, min SOC 0.2, event duration = 4 
     d["Home-avg_resilience_hours"] = results["resilience"]["avg_resilience_no_notice"]
+    
+    d["LCC Breakdown-lcc"] = results["financial"]["LCC"] 
+    d["LCC Breakdown-total_capex_and_replacement_cost"] = results["financial"]["net_capital_costs"]
+    d["LCC Breakdown-total_om_cost"] = results["financial"]["total_om_cost"]
+    # d["LCC Breakdown-total_fuel_cost"] = results["financial"]["total_fuel_cost"]
+    d["LCC Breakdown-total_utility_energy_cost"] = results["utility_bill"]["total_utility_energy_cost"]
+    d["LCC Breakdown-total_utility_demand_cost"] = results["utility_bill"]["total_utility_demand_cost"]
+    d["LCC Breakdown-total_total_utility_fixed_cost"] = results["utility_bill"]["total_utility_fixed_cost"]
+    d["LCC Breakdown-total_utility_min_cost_adder_cost"] = results["utility_bill"]["total_utility_min_cost_adder_cost"]
+    d["LCC Breakdown-total_utility_coincident_peak_cost"] = results["utility_bill"]["total_utility_coincident_peak_cost"]
+    d["LCC Breakdown-total_export_benefit"] = results["utility_bill"]["total_export_benefit"]
+    # d["LCC Breakdown-total_production_incentive_benefit"] = results["financial"]["total_production_incentive_benefit"]
+    d["LCC Breakdown-total_climate_cost"] = results["emissions"]["total_climate_cost"]
+    d["LCC Breakdown-total_health_cost "] = results["emissions"]["total_health_cost"]
+    # d["LCC Breakdown-total_resource_adequacy_benefit"] = results["financial"]["total_resource_adequacy_benefit"]
+    d["LCC Breakdown-wh_comfort_cost_total"] = results["comfort"]["total_wh_comfort_cost"]
+    d["LCC Breakdown-total_hvac_comfort_cost"] = results["comfort"]["total_hvac_comfort_cost"]
+    
     
     cf_metrics = cover_factor_metrics(results)
     for key in cf_metrics:
@@ -149,15 +167,15 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     
     d["Financial-npv"] = baseline["financial"]["LCC"] - results["financial"]["LCC"]
     d["Financial-annual_bill_reduction"] = baseline["utility_bill"]["annual_bill"] - results["utility_bill"]["annual_bill"]
-    d["Financial-annual_energy_bill_reduction"] = baseline["utility_bill"]["energy"] - results["utility_bill"]["energy"]
-    d["Financial-annual_export_benefits"] = baseline["utility_bill"]["export_benefits"] - results["utility_bill"]["export_benefits"]
+    d["Financial-annual_energy_bill_reduction"] = baseline["utility_bill"]["total_utility_energy_cost"] - results["utility_bill"]["total_utility_energy_cost"]
+    d["Financial-annual_export_benefits"] = baseline["utility_bill"]["total_export_benefit"] - results["utility_bill"]["total_export_benefit"]
     
     d["Home-load_reduction_kwh"] = sum(baseline["load"]["home_load"]) - sum(results["load"]["home_load"])
     d["External-grid_energy_reductions_kwh"] = baseline["load"]["annual_grid_purchases"] - results["load"]["annual_grid_purchases"]
     
     d["External-emission_reductions"] = baseline["emissions"]["annual_emissions_lb_CO2"] - results["emissions"]["annual_emissions_lb_CO2"]
     
-    d["Home-comfort_change"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
+    d["Home-comfort_change_dollars"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
     
     d["External-max_grid_purchase_change_kw"] = max(baseline["load"]["grid_purchases_kw"]) - max(results["load"]["grid_purchases_kw"])
     d["Home-change_in_avg_hourly_ra"] = results["ra"]["avg_hourly_ra_reduction"] - baseline["ra"]["avg_hourly_ra_reduction"]
@@ -317,7 +335,7 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
         d[b] = df
     ##
     with pd.ExcelWriter(os.path.join(metrics_folder, metrics_results_file_name)) as writer:
-        for sheet_name in ["Run Type", "Financial", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
+        for sheet_name in ["Run Type", "Financial", "LCC Breakdown", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
             d[sheet_name].to_excel(writer, sheet_name = sheet_name, index = False)
 #%%
 def generate_timeseries(reopt_results_folder, timeseries_output_folder):

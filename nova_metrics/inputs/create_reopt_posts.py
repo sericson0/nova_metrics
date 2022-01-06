@@ -14,11 +14,12 @@ import pathlib
 # import nova_metrics.apiquery.find_urdb as Find_URDB
 #TODO add water heater and HVAC inputs
 from nova_metrics.support.utils import load_post, not_none
-from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs, get_pv_prod_factor
+from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs, get_pv_prod_factor, wh_post, hvac_post
 from nova_metrics.support.logger import log
 #%%
 
-def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "", ochre_output_main_folder = ""):
+def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",
+                       ochre_output_main_folder = ""):
     """
     Create reopt json posts from input excel sheet in `inputs_folder`/`inputs_file_name`.
 
@@ -56,7 +57,8 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
       create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_output_main_folder)
       
 #%%
-def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "./", pv_watts_api_key = "", ochre_output_main_folder = ""):
+def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "./", 
+                             pv_watts_api_key = "", ochre_output_main_folder = ""):
     """
     Create single reopt json posts using `defaults` as template and adding `input_vals`
 
@@ -94,18 +96,30 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
     if add_pv_prod_factor:
         post["Scenario"]["Site"]["PV"]["prod_factor_series_kw"] = get_pv_prod_factor(input_vals, solar_profile_folder, post, pv_watts_api_key)
         
+    #Add load profile
+    if ("load_file" in input_vals) and not_none(input_vals["load_file"]):
+        if "LoadProfile" not in post["Scenario"]["Site"]:
+            post["Scenario"]["Site"]["LoadProfile"] = {}
+        post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(pd.read_csv(input_vals["load_file"], header=None).iloc[:,0])
+
     #Load ochre outputs
     if ("ochre_folder" in input_vals) and  not_none(input_vals["ochre_folder"]):
-        parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = load_ochre_outputs(os.path.join(ochre_output_main_folder, input_vals["ochre_folder"]))
+        ochre_outputs = load_ochre_outputs(os.path.join(ochre_output_main_folder, input_vals["ochre_folder"]))
+        parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
         
         if "LoadProfile" not in post["Scenario"]["Site"]:
             post["Scenario"]["Site"]["LoadProfile"] = {}
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
-                
-    #Add load profile
-    if ("load_file" in input_vals) and not_none(input_vals["load_file"]):
-        post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(pd.read_csv(input_vals["load_file"]).iloc[:,0])
         
+        if ("controllable_loads_setpoints" in input_vals) and not_none(input_vals["controllable_loads_stepoints"]):
+            with open(input_vals["controllable_loads_setpoints"], "r") as fp:
+                ctr_ld_stp = json.load(fp)
+            if "WH" in ctr_ld_stp:
+                wh_post(post, ochre_outputs, ctr_ld_stp["WH"]["wh_temperature_lower_bound"], ctr_ld_stp["WH"]["wh_temperature_upper_bound"], ctr_ld_stp["WH"]["wh_comfort_temp_limit"])
+        if "HVAC" in  ctr_ld_stp:
+            hvac_post(post, ochre_outputs, ctr_ld_stp["HVAC"]["hvac_temperature_lower_bound"], ctr_ld_stp["HVAC"]["hvac_temperature_upper_bound"], 
+                      ctr_ld_stp["HVAC"]["hvac_comfort_temp_lower_bound"], ctr_ld_stp["HVAC"]["hvac_comfort_temp_upper_bound"])
+                
         
     if "output_subfolder" in input_vals and not_none(input_vals["output_subfolder"]):
         output_folder = os.path.join(main_output_folder, input_vals["output_subfolder"])

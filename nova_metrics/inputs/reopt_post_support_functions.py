@@ -110,86 +110,16 @@ def get_pv_prod_factor(input_vals, solar_profile_folder, post, pv_watts_api_key)
         return list(pd.read_csv(pv_prod_factor_csv_file_path, header=None).iloc[:,0]) 
             
         
-
-
-# #Takes in input dictionary and outputs REopt post dictionary
-# def get_REopt_post(inputs, main_folder_path):
-#     OCHRE_outputs = load_OCHRE_outputs(os.path.join(main_folder_path, inputs["FilePaths"]["ochre_folder_path"]))
-    
-#     parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = OCHRE_outputs
-    
-#     #Start with dictionary of default post
-#     post = copy.deepcopy(inputs["DefaultPost"])
-    
-#     #additional costs do not have way to be passed through REopt run to metrics, so are included in scenario description, which is otherwise unused
-#     post["Scenario"]["description"] = inputs["additional_costs"]
-
-#     #Scenario inputs are under keyword "PostValues"
-#     update_post_vals = {"Scenario": {"Site": inputs["PostValues"]}}
-#     update_nested_dict(post, update_post_vals)
-
-#     #Get building load
-#     if "optional_load" in inputs:
-#         load = inputs["Building"]["optional_load"]
-#     else:
-#         load = hourly_inputs.loc[:, elec_load_col]
-#     post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(load)
-    
-    
-#     #Option for custom rate
-#     if "custom_rate" in inputs: 
-#         post['Scenario']['Site']['ElectricTariff']['urdb_response'] = inputs["custom_rate"] 
-
-#     if post['Scenario']['Site']['PV']['max_kw'] > 0:
-#         post['Scenario']['Site']['PV']['prod_factor_series_kw'] = inputs["PV_prod_factor_series_kw"] 
-      
-#     #Add water heater    
-#     if "WH" in inputs:
-#         wh_inputs = inputs["Water_Heater"]
-#         wh_post(post, parsed_prop, OCHRE_outputs, wh_inputs)
-        
-#     #Add HVAC  
-#     if "HVAC" in inputs: 
-#         HVAC_inputs = inputs["HVAC"]
-#         HVAC_post(post, OCHRE_outputs, HVAC_inputs)
-
-#     #TODO See if this needs to be added or not
-#     # if not ("WH" in inputs or "HVAC" in inputs):
-#     #     post['Scenario']['Site']['RC']['use_flexloads_model'] = False
-#     #     post['Scenario']['Site']['FlexTechERWH']['size_kw'] = 0
-#     #     post['Scenario']['Site']['FlexTechHPWH']['size_kw'] = 0
-#     #     # ra_post=None
-    
-#     # custom_post = None 
-#     # if inputs["utility"]["urdb_label"] == 'custom':
-#     #     custom_post = load_post(inputs["custom_post"]["custom_post_data_path"], inputs["custom_post_filename"])
-#     # Save some OCHRE outputs in REopt results
-#     #TODO See if the ochre outputs part can be removed
-#     ochre_outputs = {}
-#     ochre_outputs['indoor_temp_degC'] = list(hourly_inputs.loc[:, space_node_col])
-#     ochre_outputs['outdoor_temp_degC'] = list((hourly_inputs.loc[:, 'Temperature - Outdoor (C)'] * 9/5) + 32)
-#     ochre_outputs['hvac_cooling_delivered_kw'] = list(hourly_inputs.loc[:, ac_delivered_col])
-#     ochre_outputs['hvac_heating_delivered_kw'] = list(hourly_inputs.loc[:, hp_delivered_col])
-#     ochre_outputs['hvac_cooling_elec_power_kw'] = list(hourly_inputs.loc[:, ac_consumption_col])
-#     ochre_outputs['hvac_heating_elec_power_kw'] = list(hourly_inputs.loc[:, hp_consumption_col])
-    
-#     return post, ochre_outputs
-                        
- 
-
-def wh_post(post, OCHRE_outputs, wh_inputs, ochre_outputs_to_reopt):
+def wh_post(post, ochre_outputs, wh_temperature_lower_bound, wh_temperature_upper_bound, wh_comfort_temp_limit):
     #Adds relevant post information for water heater dispatch
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = OCHRE_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
     erwh_size_kw, hpwh_size_kw = get_system_sizes(parsed_prop)[-2:]
     
-    wh_temperature_lower_bound = wh_inputs["wh_temperature_lower_bound"]
-    wh_temperature_upper_bound = wh_inputs["wh_temperature_upper_bound"]
-    wh_comfort_temp_limit = wh_inputs["wh_comfort_temp_limit"]
     
     if (erwh_size_kw + hpwh_size_kw) > 0.01:
-        ochre_outputs_to_reopt['wh_outlet_temp_degC'] = list(hourly_inputs.loc[:, 'Hot Water Outlet Temperature (C)'])
-        ochre_outputs_to_reopt['wh_heating_delivered_kw'] = list(hourly_inputs.loc[:, wh_delivered_col])
-        ochre_outputs_to_reopt['wh_elec_power_kw'] = list(hourly_inputs.loc[:, wh_consumption_col])
+        # ochre_outputs_to_reopt['wh_outlet_temp_degC'] = list(hourly_inputs.loc[:, 'Hot Water Outlet Temperature (C)'])
+        # ochre_outputs_to_reopt['wh_heating_delivered_kw'] = list(hourly_inputs.loc[:, wh_delivered_col])
+        # ochre_outputs_to_reopt['wh_elec_power_kw'] = list(hourly_inputs.loc[:, wh_consumption_col])
         
         wh_load = list(hourly_inputs.loc[:, wh_consumption_col])
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = [post['Scenario']['Site']['LoadProfile']['loads_kw'][i] - wh_load[i] for i in range(len(wh_load))]
@@ -239,15 +169,11 @@ def wh_post(post, OCHRE_outputs, wh_inputs, ochre_outputs_to_reopt):
     return None
 
 
-def hvac_post(post, OCHRE_outputs, HVAC_inputs):
+def hvac_post(post, ochre_outputs, hvac_temperature_lower_bound, hvac_temperature_upper_bound, hvac_comfort_temp_lower_bound, hvac_comfort_temp_upper_bound):
     #Add relevant post information for HVAC dispatch
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = OCHRE_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
     ac_size_kw, hp_size_kw, ac_size_heat, hp_size_heat, erwh_size_kw, hpwh_size_kw = get_system_sizes(parsed_prop)
     
-    hvac_temperature_lower_bound = HVAC_inputs["hvac_temperature_lower_bound"]
-    hvac_temperature_upper_bound = HVAC_inputs["hvac_temperature_upper_bound"]
-    hvac_comfort_temp_lower_bound = HVAC_inputs["hvac_comfort_temp_lower_bound"]
-    hvac_comfort_temp_upper_bound = HVAC_inputs["hvac_comfort_temp_upper_bound"]
     # Electric load net of the consumption of REopt controlled technologies
     hvac_load = hourly_inputs.loc[:, hp_consumption_col] + hourly_inputs.loc[:, ac_consumption_col]
     post['Scenario']['Site']['LoadProfile']['loads_kw'] = [post['Scenario']['Site']['LoadProfile']['loads_kw'][i] - hvac_load[i] for i in range(len(hvac_load))]
@@ -278,9 +204,6 @@ def hvac_post(post, OCHRE_outputs, HVAC_inputs):
     ac_prodfactor = hourly_inputs.loc[:, ac_capacity_col] / ac_size_heat
     hp_prodfactor = hourly_inputs.loc[:, hp_capacity_col] / hp_size_heat
 
-    if sum(er_on)>0:
-        print('ER ON')
-        
     # Zero out prodfactors where necessary to ensure heating and cooling cannot occur simultaneously
 #        space_cond = u_inputs.loc[:, hvac_injection_node_col]
 #        ac_prodfactor[space_cond < -500] = 0.01
@@ -328,12 +251,4 @@ def hvac_post(post, OCHRE_outputs, HVAC_inputs):
     return None
     
 
-#Combines two nested dictionaries into one
-# def update_nested_dict(d, u):
-#     for k, v in u.items():
-#         if isinstance(v, collections.abc.Mapping):
-#             d[k] = update_nested_dict(d.get(k, {}), v)
-#         else:
-#             d[k] = v
-#     return d
 
