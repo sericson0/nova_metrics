@@ -45,9 +45,8 @@ def main():
                        solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_output_main_folder = ochre_out_folder)
         
     if args.reopt or args.all:
-        if "reopt_root_url" in api_keys:
-            root_url = api_keys["reopt_root_url"]
-            print(root_url)
+        if "reopt_root_url" in filepaths:
+            root_url = filepaths["reopt_root_url"]
         else:
             root_url = 'https://developer.nrel.gov/api/reopt'
         run_reopt(filepaths["reopt_posts"], filepaths["reopt_results"], api_keys["reopt"], root_url = root_url, overwrite = args.keep_runs)

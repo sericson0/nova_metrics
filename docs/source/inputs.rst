@@ -19,6 +19,8 @@ Most file paths are relative to the *main_folder*. The folder *timeseries_output
 * **solar_profile_folder** Folder to store PV watts production factor outputs.
 * **default_values_file** Path (including file name) to *default_post.json*.
 * **metrics_folder** Folder to store metrics outputs. 
+* **reopt_root_url** optional path to api branch. If not omitted then defaults to 'https://developer.nrel.gov/api/reopt'.
+* **ochre_output_main_folder** optional path to folder containing OCHRE output subfolders. If omitted then defaults to "".
 
 REopt Posts
 ------------------
