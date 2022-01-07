@@ -37,8 +37,13 @@ def main():
     api_keys = dict(zip(api_keys.key_name, api_keys.key_val))
     #%%
     if args.posts or args.all:
+        if "ochre_output_main_folder" in filepaths:
+            ochre_out_folder = filepaths["ochre_output_main_folder"]
+        else:
+            ochre_out_folder = ""
         create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], add_pv_prod_factor = True,
-                       solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"])
+                       solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_output_main_folder = ochre_out_folder)
+        
     if args.reopt or args.all:
         if "reopt_root_url" in api_keys:
             root_url = api_keys["reopt_root_url"]

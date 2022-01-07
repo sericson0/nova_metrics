@@ -115,11 +115,3 @@ def run_reopt(post_folder, results_folder, api_key, root_url = 'https://develope
             post = load_post(post_dir, post_name)
             reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
             save_post(reopt_results, results_dir, post_name)
-
-
-
-
-# post = load_post("C:/Users/sean/Dropbox/NREL Work/Year 2020/NOVA/nova_tutorial/REopt Posts", "sized_solar_sized_storage.json")
-# API_KEY = "eb14ACcUKmGtJT8WeB4kuJayhFNhWTSxpLTonqZ7"
-# reopt_results = reo_optimize(post, API_KEY, root_url='https://nova-analysis2-reopt-dev-api.its.nrel.gov', poll_interval=10)
-
