@@ -27,22 +27,29 @@ def main():
     main_folder = "./"
     
     inputs_file_name = args.inputs_file_path
-    inputs_file = os.path.join(main_folder, inputs_file_name)
+    
+    inputs = pd.read_excel(os.path.join(main_folder, inputs_file_name), None)
 
+    
 
-    filepaths = pd.read_excel(inputs_file, sheet_name = "File Paths")
+    filepaths = inputs["File Paths"]
     filepaths= dict(zip(filepaths.path_type, filepaths.path_name))
 
-    api_keys = pd.read_excel(inputs_file, sheet_name = "API Keys")
+
+    api_keys = inputs["API Keys"]
     api_keys = dict(zip(api_keys.key_name, api_keys.key_val))
+    
+    #Set OCHRE values
+    if "OCHRE" in inputs:
+        ochre_controls = inputs["OCHRE"]
+        ochre_controls = dict(zip(ochre_controls.ochre_type, ochre_controls.ochre_value))
+    else:
+        ochre_controls = {}
+        
     #%%
     if args.posts or args.all:
-        if "ochre_output_main_folder" in filepaths:
-            ochre_out_folder = filepaths["ochre_output_main_folder"]
-        else:
-            ochre_out_folder = ""
         create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], add_pv_prod_factor = True,
-                       solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_output_main_folder = ochre_out_folder)
+                       solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_controls = ochre_controls)
         
     if args.reopt or args.all:
         if "reopt_root_url" in filepaths:
@@ -52,7 +59,7 @@ def main():
         run_reopt(filepaths["reopt_posts"], filepaths["reopt_results"], api_keys["reopt"], root_url = root_url, overwrite = args.keep_runs)
 
     if args.metrics or args.all:
-        metrics_inputs = pd.read_excel(inputs_file, sheet_name = "Generate Metrics")
+        metrics_inputs = inputs["Generate Metrics"]
         if "wholesale_price_folder" in filepaths:
             wholesale_price_path = filepaths["wholesale_price_folder"]
         else:

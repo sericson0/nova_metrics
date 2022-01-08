@@ -19,7 +19,7 @@ from nova_metrics.support.logger import log
 #%%
 
 def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",
-                       ochre_output_main_folder = ""):
+                       ochre_controls = {}):
     """
     Create reopt json posts from input excel sheet in `inputs_folder`/`inputs_file_name`.
 
@@ -45,8 +45,8 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
         path to folder where solar profiles are saved.
     pv_watts_api_key : str
         key to download solar proviles from PV watts.
-    ocher_output_main_folder : str
-        path to OCHRE building model output.
+    ochre_controls : dict
+        optional dictionary of OCHRE building model output values (such as folder path).
     """
     pathlib.Path(solar_profile_folder).mkdir(parents=True, exist_ok=True)
     
@@ -54,11 +54,11 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
     defaults = load_post(inputs_folder, default_values_file)
     
     for i, input_vals in inputs_df.iterrows():
-      create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_output_main_folder)
+      create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
       
 #%%
 def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "./", 
-                             pv_watts_api_key = "", ochre_output_main_folder = ""):
+                             pv_watts_api_key = "", ochre_controls = {}):
     """
     Create single reopt json posts using `defaults` as template and adding `input_vals`
 
@@ -84,8 +84,8 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         path to folder where solar profiles are saved.
     pv_watts_api_key : str
         key to download solar proviles from PV watts.
-    ocher_output_main_folder : str
-        path to OCHRE building model output.
+    ochre_controls : dict
+        optional dictionary of OCHRE building model output values (such as folder path).
     """
     pathlib.Path(main_output_folder).mkdir(parents=True, exist_ok=True)
     
@@ -104,21 +104,18 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
 
     #Load ochre outputs
     if ("ochre_folder" in input_vals) and  not_none(input_vals["ochre_folder"]):
-        ochre_outputs = load_ochre_outputs(os.path.join(ochre_output_main_folder, input_vals["ochre_folder"]))
+        ochre_outputs = load_ochre_outputs(input_vals["ochre_folder"], ochre_controls)
         parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
         
         if "LoadProfile" not in post["Scenario"]["Site"]:
             post["Scenario"]["Site"]["LoadProfile"] = {}
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
         
-        if ("controllable_loads_setpoints" in input_vals) and not_none(input_vals["controllable_loads_stepoints"]):
-            with open(input_vals["controllable_loads_setpoints"], "r") as fp:
-                ctr_ld_stp = json.load(fp)
-            if "WH" in ctr_ld_stp:
-                wh_post(post, ochre_outputs, ctr_ld_stp["WH"]["wh_temperature_lower_bound"], ctr_ld_stp["WH"]["wh_temperature_upper_bound"], ctr_ld_stp["WH"]["wh_comfort_temp_limit"])
-        if "HVAC" in  ctr_ld_stp:
-            hvac_post(post, ochre_outputs, ctr_ld_stp["HVAC"]["hvac_temperature_lower_bound"], ctr_ld_stp["HVAC"]["hvac_temperature_upper_bound"], 
-                      ctr_ld_stp["HVAC"]["hvac_comfort_temp_lower_bound"], ctr_ld_stp["HVAC"]["hvac_comfort_temp_upper_bound"])
+        if "WH" in input_vals and not_none(input_vals["WH"]):
+            wh_post(post, ochre_outputs, ochre_controls) # wh_lower_bound, wh_upper_bound, wh_comfort_limit)
+            
+        if "HVAC" in input_vals and not_none(input_vals["WH"]):
+            hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
                 
         
     if "output_subfolder" in input_vals and not_none(input_vals["output_subfolder"]):
@@ -143,7 +140,7 @@ def update_post(post, name, val):
         if type(val) is np.int64:
             val = int(val)
             
-        if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file"]:
+        if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file", "WH", "HVAC"]:
             pass
         elif name == "description":
             post["Scenario"]["description"] = val

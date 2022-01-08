@@ -187,3 +187,8 @@ def load_api_results(path, filename):
     return api_response
 
 
+def get_dictionary_value(d, name, default = ""):
+    if name in d and not_none(d[name]):
+        return d[name]
+    else:
+        return default
