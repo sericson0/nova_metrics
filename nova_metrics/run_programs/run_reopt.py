@@ -25,7 +25,8 @@ def reo_optimize(post, API_KEY, root_url='https://developer.nrel.gov/api/reopt',
     resp = requests.post(url=post_url, json=post)
 
     if not resp.ok:
-        print("Status code {}. {}".format(resp.status_code, resp.content))
+        # print("Status code {}. {}".format(resp.status_code, resp.content))
+        print("Status code {}.".format(resp.status_code))
     else:
         print("Response OK from {}.".format(post_url))
         run_id_dict = json.loads(resp.text)
