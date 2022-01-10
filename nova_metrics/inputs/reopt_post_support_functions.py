@@ -132,15 +132,13 @@ def wh_post(post, ochre_outputs, ochre_controls):
     wh_temperature_lower_bound = get_dictionary_value(ochre_controls, "wh_temperature_lower_bound", 30)
     wh_temperature_upper_bound = get_dictionary_value(ochre_controls, "wh_temperature_upper_bound", 60)
     wh_comfort_temp_limit = get_dictionary_value(ochre_controls, "wh_comfort_temp_limit", 43)
-    # print(hourly_inputs.columns)
     
     if (erwh_size_kw + hpwh_size_kw) > 0.01:
         wh_load = list(hourly_inputs.loc[:, wh_consumption_col])
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = [post['Scenario']['Site']['LoadProfile']['loads_kw'][i] - wh_load[i] for i in range(len(wh_load))]
 
-        #TODO DEBUG        
-        # init_temperatures_wh = hourly_inputs.loc[:, a_matrix_wh.keys()]
-        # init_temperatures_wh = list(init_temperatures_wh.iloc[0])
+        init_temperatures_wh = hourly_inputs.loc[:, a_matrix_wh.keys()]
+        init_temperatures_wh = list(init_temperatures_wh.iloc[0])
         if hpwh_size_kw > 0.01:
             hpwh_cop = list(hourly_inputs.loc[:, hpwh_cop_col])
             hpwh_prodfactor = list(hourly_inputs.loc[:, hpwh_capacity_col] / hpwh_size_kw)
@@ -152,14 +150,14 @@ def wh_post(post, ochre_outputs, ochre_controls):
         wh_injection_node_num = b_matrix_wh.columns.get_loc(wh_injection_node_col) + 1
         water_node_num = a_matrix_wh.columns.get_loc(water_node_col) + 1
     
-        #TODO Debug
-        # u_inputs_wh = hourly_inputs.loc[:, b_matrix_wh.keys()]
-        # u_inputs_wh.loc[:, wh_injection_node_col] = u_inputs_wh.loc[:, wh_injection_node_col] - \
-        #                                             hourly_inputs.loc[:, wh_delivered_col] * 1000
+        u_inputs_wh = hourly_inputs.loc[:, b_matrix_wh.keys()]
+        u_inputs_wh.loc[:, wh_injection_node_col] = u_inputs_wh.loc[:, wh_injection_node_col] - \
+                                                    hourly_inputs.loc[:, wh_delivered_col] * 1000
                                                     
         a_matrix_wh = list(a_matrix_wh.T.stack().reset_index(name='new')['new'])
         b_matrix_wh = list(b_matrix_wh.T.stack().reset_index(name='new')['new'])
-        # u_inputs_wh = list(u_inputs_wh.T.stack().reset_index(name='new')['new'])
+        u_inputs_wh = list(u_inputs_wh.T.stack().reset_index(name='new')['new'])
+    #TODO check what this does
     # post['Scenario']['Site']['RC']['use_flexloads_model'] = False
     if 'HotWaterTank' not in post['Scenario']['Site']:
         post['Scenario']['Site']['HotWaterTank'] = {}
@@ -167,11 +165,9 @@ def wh_post(post, ochre_outputs, ochre_controls):
     post['Scenario']['Site']['HotWaterTank']['a_matrix'] = a_matrix_wh
     post['Scenario']['Site']['HotWaterTank']['b_matrix'] = b_matrix_wh
     
-    #TODO Debug
-    # post['Scenario']['Site']['HotWaterTank']['u_inputs'] = u_inputs_wh
+    post['Scenario']['Site']['HotWaterTank']['u_inputs'] = u_inputs_wh
     
-    #TODO Debug
-    # post['Scenario']['Site']['HotWaterTank']['init_temperatures_degC'] = init_temperatures_wh
+    post['Scenario']['Site']['HotWaterTank']['init_temperatures_degC'] = init_temperatures_wh
     post['Scenario']['Site']['HotWaterTank']['n_temp_nodes'] = n_temp_nodes_wh
     post['Scenario']['Site']['HotWaterTank']['n_input_nodes'] = n_input_nodes_wh
     post['Scenario']['Site']['HotWaterTank']['injection_node'] = wh_injection_node_num
@@ -207,9 +203,8 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     hvac_load = hourly_inputs.loc[:, hp_consumption_col] + hourly_inputs.loc[:, ac_consumption_col]
     post['Scenario']['Site']['LoadProfile']['loads_kw'] = [post['Scenario']['Site']['LoadProfile']['loads_kw'][i] - hvac_load[i] for i in range(len(hvac_load))]
     # Get initial HVAC temperatures
-    #TODO Debug
-    # init_temperatures_hvac = hourly_inputs.loc[:, a_matrix.keys()]
-    # init_temperatures_hvac = list(init_temperatures_hvac.iloc[0])
+    init_temperatures_hvac = hourly_inputs.loc[:, a_matrix.keys()]
+    init_temperatures_hvac = list(init_temperatures_hvac.iloc[0])
 
     ac_cop, hp_cop, ac_fan_power_ratio, hp_fan_power_ratio, ac_dse, hp_dse, er_on = \
             get_hvac_inputs(parsed_prop, hourly_inputs, hp_cop_col, ac_cop_col, hp_delivered_col, hp_fan_power_col, hp_er_col)
@@ -223,11 +218,10 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     # HVAC injection node output contains all equipment gains (HVAC, water heater, lighting, appliances, etc.)
     # Subtract out REopt controlled equipment 
     
-    #TODO Debug
-    # u_inputs = hourly_inputs.loc[:, b_matrix.keys()]
-    # u_inputs.loc[:, hvac_injection_node_col] = u_inputs.loc[:, hvac_injection_node_col] + \
-    #                                            hourly_inputs.loc[:, ac_delivered_col] * 1000 - \
-    #                                            hourly_inputs.loc[:, hp_delivered_col] * 1000
+    u_inputs = hourly_inputs.loc[:, b_matrix.keys()]
+    u_inputs.loc[:, hvac_injection_node_col] = u_inputs.loc[:, hvac_injection_node_col] + \
+                                                hourly_inputs.loc[:, ac_delivered_col] * 1000 - \
+                                                hourly_inputs.loc[:, hp_delivered_col] * 1000
     # HVAC production factors - normalize by nominal capacity
     ac_prodfactor = hourly_inputs.loc[:, ac_capacity_col] / ac_size_heat
     hp_prodfactor = hourly_inputs.loc[:, hp_capacity_col] / hp_size_heat
@@ -244,8 +238,7 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     # Convert matrices to lists for API input
     a_matrix = list(a_matrix.T.stack().reset_index(name='new')['new'])
     b_matrix = list(b_matrix.T.stack().reset_index(name='new')['new'])
-    #TODO Debug
-    # u_inputs = list(u_inputs.T.stack().reset_index(name='new')['new'])
+    u_inputs = list(u_inputs.T.stack().reset_index(name='new')['new'])
     if "RC" not in post['Scenario']['Site']:
         post['Scenario']['Site']["RC"] = {}
         
@@ -257,10 +250,8 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     post['Scenario']['Site']['RC']['use_flexloads_model'] = True
     post['Scenario']['Site']['RC']['a_matrix'] = a_matrix
     post['Scenario']['Site']['RC']['b_matrix'] = b_matrix
-    #TODO Debug
-    # post['Scenario']['Site']['RC']['u_inputs'] = u_inputs
-    #TODO Debug
-    # post['Scenario']['Site']['RC']['init_temperatures'] = init_temperatures_hvac
+    post['Scenario']['Site']['RC']['u_inputs'] = u_inputs
+    post['Scenario']['Site']['RC']['init_temperatures'] = init_temperatures_hvac
     post['Scenario']['Site']['RC']['n_temp_nodes'] = n_temp_nodes_hvac
     post['Scenario']['Site']['RC']['n_input_nodes'] = n_input_nodes_hvac
     post['Scenario']['Site']['RC']['injection_node'] = hvac_injection_node_num
