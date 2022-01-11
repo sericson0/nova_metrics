@@ -220,17 +220,16 @@ def emissions_values(reopt_results):
 
 #%%
 def comfort_values(reopt_results):
+    d = {
+    "total_wh_comfort_cost": 0,
+    "total_hvac_comfort_cost": 0
+        }
     if "RC" in reopt_results["outputs"]["Scenario"]["Site"]:
         outputs = reopt_results["outputs"]["Scenario"]["Site"]["RC"]
-        d = {
-        "total_wh_comfort_cost": outputs["wh_comfort_cost_total"],
-        "total_hvac_comfort_cost": outputs["hvac_comfort_cost_total"]
-        }
-    else:
-        d = {
-        "total_wh_comfort_cost": 0,
-        "total_hvac_comfort_cost": 0
-            }
+        if "wh_comfort_cost_total" in outputs:
+            d["total_wh_comfort_cost"] = outputs["wh_comfort_cost_total"]
+        if "hvac_comfort_cost_total" in outputs:
+            d["total_hvac_comfort_cost"] = outputs["hvac_comfort_cost_total"]
     return d
 #%%
 def metadata_values(reopt_results, filename):
