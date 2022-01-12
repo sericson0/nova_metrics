@@ -8,11 +8,13 @@ import pandas as pd
 import argparse
 from nova_metrics.inputs.create_reopt_posts import create_reopt_posts
 from nova_metrics.run_programs.run_reopt import run_reopt
+from nova_metrics.run_programs.run_ochre import run_ochre
 from nova_metrics.analyze_results.generate_metrics import generate_metrics, generate_timeseries
 #%%
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("main_folder", help = "File path to main folder for inputs and results.")
+    parser.add_argument("-o", "--ochre", action="store_true", help = "Run OCHRE simulations.")
     parser.add_argument("-p", "--posts", action="store_true", help = "Generate REopt posts.")
     parser.add_argument("-r", "--reopt", action="store_true", help = "Run REopt for each generated post")
     parser.add_argument("-m", "--metrics", action="store_true", help = "Generate metrics.")
@@ -47,6 +49,9 @@ def main():
         ochre_controls = {}
         
     #%%
+    if ("OCHRE" in inputs and args.all) or args.ochre:
+        run_ochre(ochre_controls)
+    
     if args.posts or args.all:
         create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], add_pv_prod_factor = True,
                        solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_controls = ochre_controls)

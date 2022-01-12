@@ -22,16 +22,16 @@ hp_delivered_col = 'HVAC Heating Delivered (kW)'
 hp_consumption_col = 'HVAC Heating Electric Power (kW)'
 hp_capacity_col = 'HVAC Heating Max Capacity (kW)'
 hp_cop_col = 'HVAC Heating COP (-)'
-wh_delivered_col = 'Water Heating Delivered (kW)'
-wh_consumption_col = 'Water Heating Electric Power (kW)'
-# hpwh_capacity_col = 'Water Heating Heat Pump Max Power (kW)'
-hpwh_capacity_col = 'Water Heating Heat Pump Max Capacity (kW)'
-hpwh_cop_col = 'Water Heating Heat Pump COP (-)'
 ac_fan_power_col = 'HVAC Cooling Fan Power (kW)'
 ac_main_power_col = 'HVAC Cooling Main Power (kW)'
 hp_fan_power_col = 'HVAC Heating Fan Power (kW)'
 hp_main_power_col = 'HVAC Heating Main Power (kW)'
 hp_er_col = 'HVAC Heating ER Power (kW)'
+wh_delivered_col = 'Water Heating Delivered (kW)'
+wh_consumption_col = 'Water Heating Electric Power (kW)'
+# hpwh_capacity_col = 'Water Heating Heat Pump Max Power (kW)'
+hpwh_capacity_col = 'Water Heating Heat Pump Max Capacity (kW)'
+hpwh_cop_col = 'Water Heating Heat Pump COP (-)'
 #%%
 def load_ochre_outputs(file_path_name, ochre_controls):
     """
@@ -49,8 +49,8 @@ def load_ochre_outputs(file_path_name, ochre_controls):
 
     Returns a list of [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     """
-    if ochre_controls.get("ochre_main_folder"):
-        file_path = os.path.join(ochre_controls["ochre_main_folder"], file_path_name)
+    if ochre_controls.get("ochre_outputs_main_folder"):
+        file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], file_path_name)
     else:
         file_path = file_path_name
     

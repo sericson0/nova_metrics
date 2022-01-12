@@ -7,7 +7,8 @@ The Inputs.xlsx file defines scenario-specific inputs and determines what compar
 * **File Paths** Defines folder structure for main inputs and outputs. 
 * **REopt Posts** Each column sets a REopt input and each row specifies a post.
 * **Generate Metrics** Specifies run and baseline for metric calculations.
-* **API Keys**  User adds API keys to query various programs and data sets. 
+* **API Keys**  User adds API keys to query various programs and data sets.
+* **OCHRE** Optional sheet containing OCHRE model inputs. 
 
 File Paths
 ----------------
@@ -51,3 +52,25 @@ The *Generate Metrics* sheet specifies the results and baseline comparison for m
 * **baseline_name**	Name of REopt results json file for baseline.
 * **baseline_type** Optional string which specifies baseline comparison type in metrics outputs
 * **wholesale_price_path** Optional path to wholesle price csv file. CSV file format should be single column of prices with no header.
+
+
+API Keys
+------------
+The *API Keys* sheet specifies user keys for various api databases. There are two columns, *key_name* (which specifies what the api key is for) and *key_val* (which specifies the actual key). 
+* **pv_watts** NREL API key for downloading solar profiles. Can be obtained `here <https://developer.nrel.gov/signup/>`_.
+* **urdb** API key for downloading utility rates. Can be obtained `here <https://openei.org/services/api/signup/>`_.
+* **reopt** NREL API key for running REopt (same as pv_watts). 
+
+
+OCHRE
+---------
+Optional sheet which specifies various values for the OCHRE-REopt integration. The two columns are *ochre_type* and *ochre_value*. 
+* **ochre_inputs_main_folder** Specifies the path relative to the main folder where OCHRE input subfolders or files are stored.
+* **ochre_outputs_main_folder** Specifies the path relative to the main folder where OCHRE output subfolders or files are stored.
+* **<output file identifier>** Can input rows to overwrite how REopt searches for the various OCHRE output files. Options are:
+	* *properties_file* Defaults to ".properties".
+	* *envelope_matrixA* Defaults to "_Envelope_matrixA.csv".
+	* *envelope_matrixB* Defaults to "_Envelope_matrixB.csv".
+	* *hourly_inputs* Defaults to "_hourly.csv"
+	* *water_tank_matrixA* Defaults to "_Water Tank_matrixA.csv".
+	* *water_tank_matrixB* Defaults to "_Water Tank_matrixB.csv".
