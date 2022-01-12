@@ -142,11 +142,15 @@ def update_post(post, name, val):
     else:
         if type(val) is np.int64:
             val = int(val)
-            
+        elif (type(val) is np.str) and ("null" in val):
+            val = None    
+        
         if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file"]:
             pass
         elif name == "description":
             post["Scenario"]["description"] = val
+        elif name == "include_climate_in_objective":
+            post["Scenario"]["include_climate_in_objective"] = val
         elif name in ["latitude", "longitude", "address", "land_acres", "roof_squarefeet", "elevation_ft"]:
             post["Scenario"]["Site"][name] = val
         else:
