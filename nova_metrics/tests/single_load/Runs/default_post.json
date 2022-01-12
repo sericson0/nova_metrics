@@ -1,7 +1,8 @@
 
 {
 "Scenario": {
-   	"Site": {
+   	"include_climate_in_objective": false,
+	"Site": {
    		"latitude": 44.15,
 		"longitude": -73.25,
 		"roof_squarefeet": 900,
@@ -13,7 +14,10 @@
 			"third_party_ownership": true
 		},
 		"ElectricTariff": {
-			"urdb_label": "5d3f1f715457a3d71ddc8c3b", 
+			"blended_monthly_rates_us_dollars_per_kwh": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+        	"blended_monthly_demand_charges_us_dollars_per_kw": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0], 
+			"coincident_peak_load_active_timesteps": [[100], [815], [1500], [2500], [3175], [3800], [4500], [5300], [6100], [7000], [7700], [8500]],
+        	"coincident_peak_load_charge_us_dollars_per_kw": [11.000, 11.250, 12.000, 11.500, 12.100, 11.900, 11.000, 11.250, 12.000, 11.500, 12.100, 11.900],
 			"net_metering_limit_kw": 500.0,
 			"wholesale_rate_above_site_load_us_dollars_per_kwh": 0.000000000000001
 		},
