@@ -5,7 +5,7 @@ import pandas as pd
 import datetime as dt
 # from ochre import Dwelling
 from pathlib import Path
-os.chdir(os.path.dirname(__file__))
+# os.chdir(os.path.dirname(__file__))
 from ochre import Dwelling
 from ochre.FileIO import default_input_path
 from nova_metrics.support.utils import get_dictionary_value, get_filename
@@ -20,7 +20,7 @@ def run_ochre(ochre_controls):
     input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "OCHRE Inputs")
     output_main_folder = get_dictionary_value(ochre_controls, "ochre_outputs_main_folder", "OCHRE Outputs")
     ochre_weather_file = get_dictionary_value(ochre_controls, "weather_file_path", "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip")
-    properties_ext = get_dictionary_value(ochre_controls, "properties_inputs_ext", "_rc_model.properties")
+    properties_ext = get_dictionary_value(ochre_controls, "properties_file", "_rc_model.properties")
     schedule_ext = get_dictionary_value(ochre_controls, "schedule_inputs_ext", "_schedule.csv")
     if "default_inputs" in ochre_controls:
         default_inputs = ochre_controls["default_inputs"]

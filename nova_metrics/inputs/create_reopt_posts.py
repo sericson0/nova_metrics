@@ -14,7 +14,8 @@ import pathlib
 # import nova_metrics.apiquery.find_urdb as Find_URDB
 #TODO add water heater and HVAC inputs
 from nova_metrics.support.utils import load_post, not_none
-from nova_metrics.inputs.reopt_post_support_functions import load_ochre_outputs, get_pv_prod_factor, wh_post, hvac_post
+from nova_metrics.inputs.reopt_post_support_functions import get_pv_prod_factor
+from nova_metrics.inputs.ochre_support_functions import load_ochre_outputs, wh_post, hvac_post
 from nova_metrics.support.logger import log
 #%%
 
