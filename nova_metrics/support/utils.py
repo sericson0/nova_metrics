@@ -35,8 +35,8 @@ def parse_properties(properties_file, **kwargs):
                 line_list = '='.join(line_split[1:]).split('   ')
                 line_list = [tuple(s.split('=')) for s in line_list]
                 out[key] = {k.strip(): float(v.strip()) for (k, v) in line_list}
-    vol = out['building length (m)'] * out['building width (m)'] * out['ceiling height (m)'] * out['num stories']
-    out['building volume (m^3)'] = vol
+    # vol = out['building length (m)'] * out['building width (m)'] * out['ceiling height (m)'] * out['num stories']
+    # out['building volume (m^3)'] = vol
     return out
 
 
@@ -187,3 +187,8 @@ def load_api_results(path, filename):
     return api_response
 
 
+def get_dictionary_value(d, name, default = ""):
+    if name in d and not_none(d[name]):
+        return d[name]
+    else:
+        return default
