@@ -256,6 +256,8 @@ def extract_results(filepath, filename):
     d = {}
     d["metadata"] = metadata_values(reopt_results, filename)
     if d["metadata"]["run_failed"]:
+        print("Run Failed")
+        print(d["metadata"])
         return d
     else:
         d["PV"] = pv_values(reopt_results)

@@ -242,6 +242,9 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
 
     """
     results = extract_results(results_folder, results_name)
+    for i in results:
+        print(i)
+    
     d = {}
     d["pv_exports"] = results["PV"]["hourly_exports"]
     d["pv_generation"] = results["PV"]["hourly_generation"]
