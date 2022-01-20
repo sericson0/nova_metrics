@@ -1,16 +1,10 @@
-  {
-
+{
   "Scenario": {
     "Site": {
       "latitude": 40.71,
       "longitude": -74.01,
-      "LoadProfile": {
-        "doe_reference_name": "RetailStore",
-        "annual_kwh": 17520.0,
-        "city": "Baltimore"
-      },
       "ElectricTariff": {
-        "urdb_label": "6112d2875457a3233ef802ce" 
+        "urdb_label": "59089b775457a3b06c5789ff" 
       },
       "PV": {
         "min_kw": 0,

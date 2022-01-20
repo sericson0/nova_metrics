@@ -256,23 +256,21 @@ def extract_results(filepath, filename):
     d = {}
     d["metadata"] = metadata_values(reopt_results, filename)
     if d["metadata"]["run_failed"]:
-        print("Run Failed")
-        print(d["metadata"])
-        return d
-    else:
-        d["PV"] = pv_values(reopt_results)
-        d["Storage"] = storage_values(reopt_results)
-        for tech_name in ["FlexTechAC", "FlexTechHP", "FlexTechERWH", "FlexTechHPWH"]:
-            d[tech_name] = flex_tech_values(reopt_results, tech_name)
-            
-        d["temperature"] = temperature_values(reopt_results)
-        d["financial"] = financial_values(reopt_results)
-        d["load"] = load_values(reopt_results)
+        print(f"Run {d['metadata']['filename']} Failed")
+
+    d["PV"] = pv_values(reopt_results)
+    d["Storage"] = storage_values(reopt_results)
+    for tech_name in ["FlexTechAC", "FlexTechHP", "FlexTechERWH", "FlexTechHPWH"]:
+        d[tech_name] = flex_tech_values(reopt_results, tech_name)
         
-        d["ra"] = ra_values(reopt_results)
-        d["utility_bill"] = utility_bill(reopt_results)
-        d["emissions"] = emissions_values(reopt_results)
-        
-        d["resilience"] = resilience_values(reopt_results, d["load"]["home_load"])
-        d["comfort"] = comfort_values(reopt_results)
-        return d 
+    d["temperature"] = temperature_values(reopt_results)
+    d["financial"] = financial_values(reopt_results)
+    d["load"] = load_values(reopt_results)
+    
+    d["ra"] = ra_values(reopt_results)
+    d["utility_bill"] = utility_bill(reopt_results)
+    d["emissions"] = emissions_values(reopt_results)
+    
+    d["resilience"] = resilience_values(reopt_results, d["load"]["home_load"])
+    d["comfort"] = comfort_values(reopt_results)
+    return d 
