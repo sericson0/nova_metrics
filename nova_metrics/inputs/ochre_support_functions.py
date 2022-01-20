@@ -257,7 +257,6 @@ def wh_post(post, ochre_outputs, ochre_controls):
         else:
             hpwh_cop = []
             hpwh_prodfactor = []
-            init_temperatures_wh = []
             
         n_temp_nodes_wh = a_matrix_wh.shape[1]
         n_input_nodes_wh = b_matrix_wh.shape[1]
