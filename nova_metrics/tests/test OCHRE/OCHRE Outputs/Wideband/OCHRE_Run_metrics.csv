@@ -1,28 +1,28 @@
 Metric,Value
-Total Electric Energy (kWh),24527.11975632303
+Total Electric Energy (kWh),21153.089028396626
 Total Gas Energy (therms),57.12415831422941
-HVAC Heating Electric Energy (kWh),15332.815427440662
-HVAC Cooling Electric Energy (kWh),1490.7668838891705
-Water Heating Electric Energy (kWh),2843.991506713
+HVAC Heating Electric Energy (kWh),12147.76632675478
+HVAC Cooling Electric Energy (kWh),1302.4346493634148
+Water Heating Electric Energy (kWh),2843.3421139982297
 Other Electric Energy (kWh),4859.545938280202
 Other Gas Energy (therms),57.12415831422941
-Average Temperature - Indoor (C),20.715011525446574
-Average Temperature - Attic (C),16.757402002847673
+Average Temperature - Indoor (C),20.748780266177516
+Average Temperature - Attic (C),13.641519230619515
 Unmet Heating Load (C-hours),0.0
 Unmet Cooling Load (C-hours),0.0
-Total HVAC Heating Delivered (kWh),15332.815427440662
+Total HVAC Heating Delivered (kWh),12147.76632675478
 Average HVAC Heating COP (-),1.0
 Average HVAC Heating SHR (-),1.0
 Average HVAC Heating Duct Efficiency (-),1.0
-Total HVAC Cooling Delivered (kWh),3513.593272630822
-Average HVAC Cooling COP (-),3.3171146786388417
-Average HVAC Cooling SHR (-),0.9815605945120413
+Total HVAC Cooling Delivered (kWh),3030.241067618066
+Average HVAC Cooling COP (-),3.2477528837847474
+Average HVAC Cooling SHR (-),0.9821435976189761
 Average HVAC Cooling Duct Efficiency (-),1.0
-Total Water Heating Delivered (kWh),2809.2946208646863
+Total Water Heating Delivered (kWh),2808.653150784299
 Average Water Heating COP (-),0.987799933380105
 "Total Hot Water Unmet Demand, Showers (kWh)",0.0
-Total Hot Water Delivered (gal/day),36.81977913460358
-Total Hot Water Delivered (kWh),2221.4434819175904
+Total Hot Water Delivered (gal/day),36.819776550834796
+Total Hot Water Delivered (kWh),2221.4434817845095
 Clothes Washer Electric Energy (kWh),99.05416975947699
 Clothes Dryer Electric Energy (kWh),58.2917685208455
 Cooking Range Electric Energy (kWh),30.699999999999974
@@ -37,5 +37,5 @@ Clothes Dryer Cycles,63.0
 Cooking Range Cycles,226.0
 "Water Heating ""Upper On"" Cycles",1.0
 "Water Heating ""Lower On"" Cycles",0.0
-HVAC Heating Cycles,221.0
-HVAC Cooling Cycles,187.0
+HVAC Heating Cycles,226.0
+HVAC Cooling Cycles,213.0

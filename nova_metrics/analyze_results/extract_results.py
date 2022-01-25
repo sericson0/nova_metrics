@@ -204,7 +204,7 @@ def temperature_values(reopt_results):
 def emissions_values(reopt_results):
     outputs = reopt_results["outputs"]["Scenario"]["Site"]
     d = {
-        "annual_emissions_lb_CO2": outputs["year_one_emissions_tCO2"],
+        "annual_emissions_tons_CO2": outputs["year_one_emissions_tCO2"],
         "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]
         }
     if reopt_results["inputs"]["Scenario"]["Site"].get("include_climate_in_objective"):

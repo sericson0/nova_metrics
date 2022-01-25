@@ -199,19 +199,19 @@ def load_ochre_outputs(file_path_name, ochre_controls):
     list
     [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     """
-    if ochre_controls.get("ochre_inputs_main_folder"):
-        ochre_input_file_path = os.path.join(ochre_controls["ochre_inputs_main_folder"], file_path_name)
-    else:
-        ochre_input_file_path = file_path_name
+    # if ochre_controls.get("ochre_inputs_main_folder"):
+    #     ochre_input_file_path = os.path.join(ochre_controls["ochre_inputs_main_folder"], file_path_name)
+    # else:
+    #     ochre_input_file_path = file_path_name
 
     if ochre_controls.get("ochre_outputs_main_folder"):
         ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], file_path_name)
     else:
         ochre_output_file_path = file_path_name
         
-    properties_file_key = get_dictionary_value(ochre_controls, "properties_file", ".yaml")
-    properties_file = get_filename(ochre_input_file_path, properties_file_key)           
-    parsed_prop = parse_properties(os.path.join(ochre_input_file_path, properties_file))
+    properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
+    properties_file = get_filename(ochre_output_file_path, properties_file_key)           
+    parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))
 
     envelope_matrixA_key = get_dictionary_value(ochre_controls, "envelope_matrixA", "_Envelope_matrixA.csv")
     a_matrix_file = get_filename(ochre_output_file_path, envelope_matrixA_key)

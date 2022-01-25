@@ -62,6 +62,7 @@ def calculate_utility_metrics(results, grid_prices = []):
         
     
         d["External-average_grid_cost_dollars_per_kwh"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])/sum(results["load"]["home_load"])
+        d["External-total_grid_cost_dollars"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])
         return d
 #%%
     
@@ -115,7 +116,7 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["Financial-annual_energy_bill"] = results["utility_bill"]["total_utility_energy_cost"]
     d["Financial-annual_demand_charges"] = results["utility_bill"]["total_utility_demand_cost"]
     
-    d["External-annual_emissions_lb_CO2"] = results["emissions"]["annual_emissions_lb_CO2"]
+    # d["External-annual_emissions_tons_CO2"] = results["emissions"]["annual_emissions_tons_CO2"]
     d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
     
     d["Home-ra_battery_capacity"] = min(results["Storage"]["kw_capacity"], (results["Storage"]["kwh_capacity"]*0.936*0.8) / 4.0) #Discharge efficiency 0.936, min SOC 0.2, event duration = 4 
@@ -173,7 +174,7 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     d["Home-load_reduction_kwh"] = sum(baseline["load"]["home_load"]) - sum(results["load"]["home_load"])
     d["External-grid_energy_reductions_kwh"] = baseline["load"]["annual_grid_purchases"] - results["load"]["annual_grid_purchases"]
     
-    d["External-emission_reductions"] = baseline["emissions"]["annual_emissions_lb_CO2"] - results["emissions"]["annual_emissions_lb_CO2"]
+    d["External-annual_emission_reductions_tons"] = baseline["emissions"]["annual_emissions_tons_CO2"] - results["emissions"]["annual_emissions_tons_CO2"]
     
     d["Home-comfort_change_dollars"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
     
@@ -277,7 +278,7 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     df = pd.DataFrame(d)
     df.to_csv(os.path.join(timesereies_output_folder, output_file_name), index=False)  
 #%%
-def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_results_file_name, wholesale_price_folder = "./"):
+def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_results_file_name, wholesale_price_folder = "./", by_building = False):
     """
     Write an Excel sheet of metrics, with rows for each results--baseline pair.
 
@@ -296,19 +297,8 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
 
     """
     Path(metrics_folder).mkdir(parents=True, exist_ok=True)
-    
     metrics_results_list = []
     for i in range(len(inputs)):
-        if "results_folder" in inputs and not_none(inputs["results_folder"][i]):
-            results_subfolder = os.path.join(reopt_results_folder, inputs["results_folder"][i])
-        else:
-            results_subfolder = reopt_results_folder
-            
-        if "baseline_folder" in inputs and not_none(inputs["baseline_folder"][i]):
-            baseline_subfolder = os.path.join(reopt_results_folder, inputs["baseline_folder"][i])
-        else:
-            baseline_subfolder = reopt_results_folder
-        
         if "baseline_type" in inputs and not_none(inputs["baseline_type"][i]):
             baseline_type = inputs["baseline_type"][i]
         else:
@@ -317,7 +307,24 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
             wholesale_price_path = os.path.join(wholesale_price_folder, inputs["wholesale_price_path"][i])
         else:
             wholesale_price_path = float("nan")
-        metrics_results_list.append(get_reopt_metrics_single_case(results_subfolder, inputs["results_name"][i]+".json", baseline_subfolder, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
+                
+        if by_building:
+            building_folders = os.listdir(reopt_results_folder)
+            for building in building_folders:
+                metrics_results_list.append(get_reopt_metrics_single_case(building, inputs["results_name"][i]+".json", building, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
+        
+        else:
+            if "results_folder" in inputs and not_none(inputs["results_folder"][i]):
+                results_subfolder = os.path.join(reopt_results_folder, inputs["results_folder"][i])
+            else:
+                results_subfolder = reopt_results_folder
+                
+            if "baseline_folder" in inputs and not_none(inputs["baseline_folder"][i]):
+                baseline_subfolder = os.path.join(reopt_results_folder, inputs["baseline_folder"][i])
+            else:
+                baseline_subfolder = reopt_results_folder
+
+            metrics_results_list.append(get_reopt_metrics_single_case(results_subfolder, inputs["results_name"][i]+".json", baseline_subfolder, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
         
     metrics = pd.DataFrame(list(filter(None, metrics_results_list)))
     filenames = metrics["filename"].tolist()
