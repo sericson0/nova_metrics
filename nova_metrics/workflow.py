@@ -10,11 +10,13 @@ import argparse
 from nova_metrics.inputs.create_reopt_posts import create_reopt_posts
 from nova_metrics.run_programs.run_reopt import run_reopt
 from nova_metrics.run_programs.run_ochre import run_ochre
+from nova_metrics.run_programs.run_resstock import run_resstock
 from nova_metrics.analyze_results.generate_metrics import generate_metrics, generate_timeseries
 #%%
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("main_folder", help = "File path to main folder for inputs and results.")
+    parser.add_argument("-b", "--buildstock", action="store_true", help = "Query ResStock and run building simulations.")
     parser.add_argument("-o", "--ochre", action="store_true", help = "Run OCHRE simulations.")
     parser.add_argument("-p", "--posts", action="store_true", help = "Generate REopt posts.")
     parser.add_argument("-r", "--reopt", action="store_true", help = "Run REopt for each generated post")
@@ -22,6 +24,7 @@ def main():
     parser.add_argument("-a", "--all", action="store_true", help = "Run full workflow.")
     parser.add_argument("-k", "--keep_runs", action="store_false", help = "Does not overwrite runs. Defaults to overwriting.")
     parser.add_argument("-i", "--inputs_file_path", default = "Inputs.xlsx", help = "Optionally specify path to input xlsx file (relative to main folder).")
+    parser.add_argument("-g", "--by_building", action = "store_true", help = "If specified then runs REopt post and metrics for each building type")
     
     args = parser.parse_args()
     
@@ -42,6 +45,8 @@ def main():
     api_keys = inputs["API Keys"]
     api_keys = dict(zip(api_keys.key_name, api_keys.key_val))
     
+    
+
     #Set OCHRE values
     if "OCHRE" in inputs:
         ochre_controls = inputs["OCHRE"]
@@ -50,11 +55,17 @@ def main():
         ochre_controls = {}
         
     #%%
+    
+    if ("resstock_yaml" in filepaths and args.all) or args.buildstock:
+        run_resstock(main_folder, filepaths["resstock_yaml"], filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
+                          simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv", "results_annual.csv"))
+    
+    
     if ("OCHRE" in inputs and args.all) or args.ochre:
         run_ochre(ochre_controls)
     
     if args.posts or args.all:
-        create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], add_pv_prod_factor = True,
+        create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], by_building = args.by_building, add_pv_prod_factor = True,
                        solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_controls = ochre_controls)
         
     if args.reopt or args.all:

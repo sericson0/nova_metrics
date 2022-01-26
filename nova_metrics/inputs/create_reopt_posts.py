@@ -18,7 +18,7 @@ from nova_metrics.inputs.ochre_support_functions import load_ochre_outputs, wh_p
 from nova_metrics.support.logger import log
 #%%
 
-def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",
+def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, by_building = False, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",
                        ochre_controls = {}):
     """
     Create reopt json posts from input excel sheet in `inputs_folder`/`inputs_file_name`.
@@ -41,6 +41,8 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
         folder path where REopt posts are saved.
     add_pv_prod_factor : bool
         if True, then adds pv factors to post.
+    by_building : bool
+        if True, then creates posts for each building type in OCHRE output folder.
     solar_profile_folder : str
         path to folder where solar profiles are saved.
     pv_watts_api_key : str
@@ -54,7 +56,21 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
     defaults = load_post(inputs_folder, default_values_file)
     
     for i, input_vals in inputs_df.iterrows():
-      create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
+        if by_building:
+            if ochre_controls.get("ochre_outputs_main_folder"):
+                ochre_outputs_main_folder = ochre_controls["ochre_outputs_main_folder"]
+            else:
+                print("No OCHRE folder is specified, defaulting to folder name OCHRE. Specify different folder through OCHRE inputs sheet.")
+                ochre_outputs_main_folder = "OCHRE"
+                
+            buildings = os.listdir(ochre_outputs_main_folder)
+            for b in buildings:
+                input_vals["ochre_folder"] = b
+                input_vals["output_subfolder"] = b
+                create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
+        else:
+            create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
+            
       
 #%%
 def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor = True, solar_profile_folder = "./", 
@@ -138,19 +154,15 @@ def update_post(post, name, val):
     else:
         if type(val) is np.int64:
             val = int(val)
-            
         if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file", "WH", "HVAC"]:
             pass
-        elif name == "description":
-            post["Scenario"]["description"] = val
-        elif name in ["latitude", "longitude", "address", "land_acres", "roof_squarefeet", "elevation_ft"]:
+        elif "ScenarioLevel|" in name:
+            name_sub = name.replace("ScenarioLevel|", "")
+            post["Scenario"][name_sub] = val
+        elif "|" not in name:
             post["Scenario"]["Site"][name] = val
         else:
-            if "|" not in name:
-                log.debug(f"{name} is in incorrect format. Please use form <upper level>|<variable>. Example of correct input is PV|max_kw")
-            else:
-                upper_level, lower_variable = name.split("|")
-                if upper_level not in post["Scenario"]["Site"]:
-                    post["Scenario"]["Site"][upper_level] = {}
-                    
+            upper_level, lower_variable = name.split("|")
+            if upper_level not in post["Scenario"]["Site"]:
+                post["Scenario"]["Site"][upper_level] = {}
                 post["Scenario"]["Site"][upper_level][lower_variable] = val

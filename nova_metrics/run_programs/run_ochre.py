@@ -1,7 +1,9 @@
 # import sys
 # sys.path.insert(1, './ochre/ochre')
 import os
-import pandas as pd
+import sys
+import shutil
+# import pandas as pd
 import datetime as dt
 # from ochre import Dwelling
 from pathlib import Path
@@ -20,8 +22,8 @@ def run_ochre(ochre_controls):
     input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "OCHRE Inputs")
     output_main_folder = get_dictionary_value(ochre_controls, "ochre_outputs_main_folder", "OCHRE Outputs")
     ochre_weather_file = get_dictionary_value(ochre_controls, "weather_file_path", "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip")
-    properties_ext = get_dictionary_value(ochre_controls, "properties_file", "_rc_model.properties")
-    schedule_ext = get_dictionary_value(ochre_controls, "schedule_inputs_ext", "_schedule.csv")
+    properties_ext = get_dictionary_value(ochre_controls, "properties_file", "in.xml")
+    schedule_ext = get_dictionary_value(ochre_controls, "schedule_inputs", "schedules.csv")
     if "default_inputs" in ochre_controls:
         default_inputs = ochre_controls["default_inputs"]
     else:
@@ -30,7 +32,6 @@ def run_ochre(ochre_controls):
     input_path_list = [Path(f[0]) for f in os.walk(input_main_folder) if len(f[2]) > 0] #Gets subdirectories which contain files
     relative_path_list = [path.relative_to(input_main_folder) for path in input_path_list]  
     output_path_list = [os.path.join(output_main_folder, p) for p in relative_path_list]
-    
     for i in range(len(input_path_list)):
         input_path = input_path_list[i]
         output_path = output_path_list[i]
@@ -39,16 +40,21 @@ def run_ochre(ochre_controls):
         ##TODO setup optional download from nsrdb
         # download_nsrdb(ochre_weather_file, location_vals["latitude"], location_vals["longitude"], api_keys["nrel_api_key"])
         
-        properties_file = get_filename(input_path, properties_ext)
-        schedule_file = get_filename(input_path, schedule_ext)
+        properties_file = os.path.abspath(os.path.join(input_path, get_filename(input_path, properties_ext)))
+        properties_yaml_name = properties_file.rsplit(".", 1)[0] + ".yaml"
         
+        schedule_file = os.path.abspath(os.path.join(input_path, get_filename(input_path, schedule_ext)))
         simulation_name = "OCHRE_Run"
 
         # ochre_rate_file = os.path.join(location_inputs_folder, building, ' Rate.csv')
         # ochre_water_draw_file = os.path.join(location_inputs_folder, building, building + "_water_file.csv")
-        print(f"properties_file {properties_file}, schedule_file {schedule_file}, weather file {ochre_weather_file}, default_inputs {default_inputs}, outputs {output_path}")
-        
-        run_ochre_single_case(simulation_name, properties_file, schedule_file, ochre_weather_file, default_inputs, output_path)
+        # print(f"properties_file: {properties_file}, schedule_file: {schedule_file}, weather file: {ochre_weather_file}, default_inputs: {default_inputs}, outputs: {output_path}")
+        try:
+            run_ochre_single_case(simulation_name, properties_file, schedule_file, ochre_weather_file, default_inputs, output_path)
+            shutil.move(properties_yaml_name, output_path)
+        except Exception as e:
+            print(f"OCHRE run {input_path} failed. Error {sys.exc_info()[0]} {e}.")
+            shutil.rmtree(output_path)
         
         
 
@@ -71,6 +77,7 @@ def run_ochre_single_case(simulation_name, properties_file, schedule_file, weath
     output_folder : str
         Path to folder where outputs will be saved.
     """
+    
     dwelling_args = {
     # Timing parameters
     'start_time': dt.datetime(2018, 1, 1, 0, 0),  # year, month, day, hour, minute
@@ -87,7 +94,7 @@ def run_ochre_single_case(simulation_name, properties_file, schedule_file, weath
     'input_path': default_input_path,
     'properties_file': properties_file, 
     'schedule_file': schedule_file,
-    # 'weather_path': weather_path,
+    'weather_path': weather_path,
 
     # Output parameters
     'save_results': True,
@@ -101,3 +108,5 @@ def run_ochre_single_case(simulation_name, properties_file, schedule_file, weath
     }
     dwelling = Dwelling(simulation_name, **dwelling_args)
     df, metrics, hourly = dwelling.simulate()
+
+# run_ochre_single_case(simulation_name, os.path.join(main_path, "in.xml"), os.path.join(main_path, "schedules.csv"), "C:/Users/sean/BuildStock_TMY3_FIPS", default_input_path, main_path)
