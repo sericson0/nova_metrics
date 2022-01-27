@@ -176,7 +176,8 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     d["External-grid_energy_reductions_kwh"] = baseline["load"]["annual_grid_purchases"] - results["load"]["annual_grid_purchases"]
     
     d["External-annual_emission_reductions_tons"] = baseline["emissions"]["annual_emissions_tons_CO2"] - results["emissions"]["annual_emissions_tons_CO2"]
-    
+    d["External-total_emission_reductions_tons"] = baseline["emissions"]["total_emissions_tons_CO2"] - results["emissions"]["total_emissions_tons_CO2"]
+
     d["Home-comfort_change_dollars"] = sum(baseline["temperature"]["comfort_penalty"]) - sum(results["temperature"]["comfort_penalty"])
     
     d["External-max_grid_purchase_change_kw"] = max(baseline["load"]["grid_purchases_kw"]) - max(results["load"]["grid_purchases_kw"])
