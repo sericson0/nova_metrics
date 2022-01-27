@@ -151,6 +151,7 @@ def utility_bill(reopt_results):
          "total_utility_fixed_cost": outputs["total_fixed_cost_us_dollars"],
          "total_utility_min_cost_adder_cost": outputs["total_min_charge_adder_us_dollars"],
          "total_utility_coincident_peak_cost": outputs["total_coincident_peak_cost_us_dollars"],
+         "total_utility_coincident_peak_cost_bau": outputs["total_coincident_peak_cost_bau_us_dollars"],
          "total_export_benefit": outputs["total_export_benefit_us_dollars"]
          # ,
          # "total_resource_adequacy_benefit": outputs["total_resource_adequacy_benefit"]
