@@ -15,7 +15,6 @@ import pathlib
 from novametrics.support.utils import load_post, not_none
 from novametrics.inputs.reopt_post_support_functions import get_pv_prod_factor
 from novametrics.inputs.ochre_support_functions import load_ochre_outputs, wh_post, hvac_post
-from novametrics.support.logger import log
 #%%
 
 def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, by_building = False, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",

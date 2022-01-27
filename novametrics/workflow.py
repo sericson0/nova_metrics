@@ -4,7 +4,7 @@ import os
 import sys
 # os.chdir(os.path.dirname(__file__))
 
-sys.path.insert(1, "../")
+# sys.path.insert(1, "../")
 import pandas as pd
 import argparse
 from novametrics.inputs.create_reopt_posts import create_reopt_posts
@@ -15,7 +15,7 @@ from novametrics.analyze_results.generate_metrics import generate_metrics, gener
 #%%
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("main_folder", help = "File path to main folder for inputs and results.")
+    parser.add_argument('main_folder', nargs='?', default=".", help =  "File path to main folder for inputs and results.")
     parser.add_argument("-b", "--buildstock", action="store_true", help = "Query ResStock and run building simulations.")
     parser.add_argument("-o", "--ochre", action="store_true", help = "Run OCHRE simulations.")
     parser.add_argument("-p", "--posts", action="store_true", help = "Generate REopt posts.")
@@ -29,9 +29,12 @@ def main():
     args = parser.parse_args()
     
     #TODO check if changing directory is necessary
-    os.chdir(args.main_folder)
-    main_folder = "./"
-    
+    # os.chdir(args.main_folder)
+    # main_folder = "./"
+
+    main_folder = args.main_folder
+    if not os.path.isabs(main_folder):
+        main_folder = os.path.join(os.getcwd(), main_folder)
     inputs_file_name = args.inputs_file_path
     
     inputs = pd.read_excel(os.path.join(main_folder, inputs_file_name), None)

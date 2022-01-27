@@ -117,7 +117,7 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["Financial-annual_demand_charges"] = results["utility_bill"]["total_utility_demand_cost"]
     
     # d["External-annual_emissions_tons_CO2"] = results["emissions"]["annual_emissions_tons_CO2"]
-    d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
+    # d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
     
     d["Home-ra_battery_capacity"] = min(results["Storage"]["kw_capacity"], (results["Storage"]["kwh_capacity"]*0.936*0.8) / 4.0) #Discharge efficiency 0.936, min SOC 0.2, event duration = 4 
     d["Home-avg_resilience_hours"] = results["resilience"]["avg_resilience_no_notice"]
@@ -244,8 +244,6 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
 
     """
     results = extract_results(results_folder, results_name)
-    for i in results:
-        print(i)
     
     d = {}
     d["pv_exports"] = results["PV"]["hourly_exports"]

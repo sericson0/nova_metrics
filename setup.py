@@ -6,8 +6,8 @@ from setuptools import setup, find_packages
 
 requirements = [
     "matplotlib",
-    "numpy"
-    "pandas=1.3.5",
+    "numpy",
+    "pandas",
     "requests",
     "urllib3"
 ]
@@ -37,7 +37,11 @@ setup(name='novametrics',
     author='Sean Ericson',
     author_email='Sean.Ericson@nrel.gov',
     url='https://github.com/sericson0/nova_metrics',
-    packages=find_packages(include=['exampleproject', 'exampleproject.*'])
-    install_requires=requirements,
-    package_data={'ochre': ['../defaults/*', '../defaults/*/*']},
+    packages=find_packages(include=['novametrics', 'novametrics.*']),
+    entry_points={
+        'console_scripts': [
+            'nova_workflow=novametrics.workflow:main'
+        ]
+    },
+    install_requires=requirements
     )
