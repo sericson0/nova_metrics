@@ -207,7 +207,7 @@ def emissions_values(reopt_results):
     d = {
         "annual_emissions_tons_CO2": outputs["year_one_emissions_tCO2"],
         "total_emissions_tons_CO2" : outputs["lifecycle_emissions_tCO2"]
-        "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]
+        # "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]
         }
     if reopt_results["inputs"]["Scenario"]["Site"].get("include_climate_in_objective"):
         d["total_climate_cost"] = outputs["lifecycle_emissions_cost_CO2"]

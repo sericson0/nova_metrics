@@ -9,6 +9,7 @@ requirements = [
     "numpy",
     "pandas",
     "requests",
+    "tqdm",
     "urllib3"
 ]
 
@@ -40,7 +41,8 @@ setup(name='novametrics',
     packages=find_packages(include=['novametrics', 'novametrics.*']),
     entry_points={
         'console_scripts': [
-            'nova_workflow=novametrics.workflow:main'
+            'nova_workflow=novametrics.workflow:main',
+            'nova_installer=novametrics.installation_helper:main'
         ]
     },
     install_requires=requirements
