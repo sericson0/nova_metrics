@@ -248,7 +248,6 @@ def load_ochre_outputs(file_path_name, ochre_controls):
         ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], file_path_name)
     else:
         ochre_output_file_path = file_path_name
-    print(ochre_output_file_path)
         
     properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
     properties_file = get_filename(ochre_output_file_path, properties_file_key)           
@@ -264,7 +263,6 @@ def load_ochre_outputs(file_path_name, ochre_controls):
     
     hourly_inputs_key = get_dictionary_value(ochre_controls, "hourly_inputs", "OCHRE_Run.csv")
     hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
-    print(hourly_inputs_file)
     hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
 
     water_tank_matrixA_key = get_dictionary_value(ochre_controls, "water_tank_matrixA", "_Water Tank_matrixA.csv")

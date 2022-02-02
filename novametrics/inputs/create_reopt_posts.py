@@ -105,7 +105,6 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
     
     post = copy.deepcopy(defaults)
     file_name = input_vals["post_name"] + ".json"
-
     
     if add_pv_prod_factor:
         post["Scenario"]["Site"]["PV"]["prod_factor_series_kw"] = get_pv_prod_factor(input_vals, solar_profile_folder, post, pv_watts_api_key)
@@ -136,7 +135,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         pathlib.Path(output_folder).mkdir(parents=True, exist_ok=True)
     else:
         output_folder = main_output_folder
-        
+    
     for name, val in input_vals.iteritems():
         update_post(post, name, val)
         
@@ -157,10 +156,10 @@ def update_post(post, name, val):
         elif "ScenarioLevel|" in name:
             name_sub = name.replace("ScenarioLevel|", "")
             post["Scenario"][name_sub] = val
-        elif "|" not in name:
-            post["Scenario"]["Site"][name] = val
-        else:
+        elif "|" in name:
             upper_level, lower_variable = name.split("|")
             if upper_level not in post["Scenario"]["Site"]:
                 post["Scenario"]["Site"][upper_level] = {}
-                post["Scenario"]["Site"][upper_level][lower_variable] = val
+            post["Scenario"]["Site"][upper_level][lower_variable] = val
+        else:
+            post["Scenario"][name] = val
