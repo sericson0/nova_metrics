@@ -27,10 +27,6 @@ def main():
     parser.add_argument("-g", "--by_building", action = "store_true", help = "If specified then runs REopt post and metrics for each building type")
     
     args = parser.parse_args()
-    
-    #TODO check if changing directory is necessary
-    # os.chdir(args.main_folder)
-    # main_folder = "./"
 
     main_folder = args.main_folder
     if not os.path.isabs(main_folder):
@@ -48,24 +44,27 @@ def main():
     api_keys = inputs["API Keys"]
     api_keys = dict(zip(api_keys.key_name, api_keys.key_val))
     
-
-
     #%%
     if "resstock_output_main_folder" not in filepaths:
             filepaths["resstock_output_main_folder"] = "ResStock"
             
-    if ("resstock_yaml" in filepaths and args.all or args.buildstock):
-        run_resstock(main_folder, filepaths["resstock_yaml"], filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
-                          simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
-    elif args.buildstock:
-        if os.path.exists("resstock.yml"):
+    if args.all or args.buildstock:
+        print("Running buildstockbatch to query ResStock")
+        if "resstock_yaml" in filepaths:
+            run_resstock(main_folder, filepaths["resstock_yaml"], filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
+                            simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
+        elif os.path.exists("resstock.yml"):
             print("No resstock yaml file specified. Defaulting to resstock.yml in main folder")
            
             run_resstock(main_folder, "resstock.yml", filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
                         simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
         else:
-            print("Could not fine resstock.yml file. Please specify name in File Paths tab.")
+            raise Exception("Could not fine resstock.yml file. Please specify name in the Inputs File Paths tab or add a file named resstock.yml to the main folder.")
     
+    #Run by building if all 
+    if args.all:
+        args.by_building = True
+
     #Set OCHRE values
     if "OCHRE" in inputs:
         ochre_controls = inputs["OCHRE"]
@@ -86,6 +85,7 @@ def main():
         run_ochre(ochre_controls)
     
     if args.posts or args.all:
+        print("Creating REopt posts.")
         create_reopt_posts(main_folder, inputs_file_name, filepaths["default_values_file"], filepaths["reopt_posts"], by_building = args.by_building, add_pv_prod_factor = True,
                        solar_profile_folder = filepaths["solar_profile_folder"], pv_watts_api_key = api_keys["pv_watts"], ochre_controls = ochre_controls)
         

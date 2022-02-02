@@ -36,9 +36,17 @@ Special inputs include the following:
 * **load_file** Specifies path to a csv file which contains hourly building load. Load is on first column with no header. 
 * **solar_production_factor_file** Specifies path to a csv file which contains PV production factors. PV production is on first column with no header. If no path is specified then will use value from PV watts. 
 
-:: 
 
-	Post inputs will insert the value directly into the REopt post. The REopt post has a nested structure of the form Scenario[Site][<Capital nested input>][<lower-case nested input>][input value]. Inputs from the *REopt Posts* sheet are inserted into Scenario[Site]. The symbol | is parsed to signify a nested input. For example, to input a value for PV max_kw, located at Scenario[Site][PV][max_kw], then specify the column name as PV|max_kw. Blank input values are ignored.  
+
+Post inputs will insert the value directly into the REopt post. Inputs can be added to the REopt nested structure with the following conventions:
+
+* ScenarioLevel|<name> will add to the top level Scenario
+* <name> will add to Scenario[Site]
+* <Upper_Level>|<lower_level> will add to Scenario[Site][Upper_level][lower_level]
+
+For example, to input a value for PV max_kw, located at Scenario[Site][PV][max_kw], specify the column name as PV|max_kw. 
+
+Blank input values are ignored.  
 
 
 
