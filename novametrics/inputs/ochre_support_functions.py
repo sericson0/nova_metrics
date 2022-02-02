@@ -84,7 +84,7 @@ def get_yaml_file(file_path):
             out["heating duct dse"] = 1
             
     else:
-        print("Building has no HVAC Heating.")
+        print(f"Building {file_path} has no HVAC Heating.")
         out['heating fuel'] = "None"
         out['heating number of speeds'] = 1
         out['heating fan power (W/cfm)'] = 0
@@ -159,7 +159,6 @@ def parse_properties(file_path):
         return {"erwh_size_kw": 0.0, "hpwh_size_kw" : 0.0, "hp_size_heat": 0.0,
                 "hp_fan_power_ratio": 0, "ac_size_kw" : 0, "ac_size_heat" : 0,
                 "ac_fan_power_ratio" : 0, "heating fuel": "", "cooling fuel": ""}
-    
     out = {}
     
     #Heating
@@ -206,12 +205,15 @@ def parse_properties(file_path):
 
     if prop_values['water heater fuel'] == "Electricity":
         #TODO See why zero is needed in code below
-        out["erwh_size_kw"] = prop_values['rated input power (W)'][0]/1000 
+        if type(prop_values['rated input power (W)']) == list:
+            out["erwh_size_kw"] = prop_values['rated input power (W)'][0]/1000 
+        else:
+            out["erwh_size_kw"] = prop_values['rated input power (W)']/1000 
         
     if prop_values['water heater type'] == 'Heatpump':
         out["hpwh_size_kw"] = 0.4
         
-    # print("\n\n\n", out, "\n\n\n")
+
     return out
 
 def load_ochre_outputs(file_path_name, ochre_controls):
@@ -246,6 +248,7 @@ def load_ochre_outputs(file_path_name, ochre_controls):
         ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], file_path_name)
     else:
         ochre_output_file_path = file_path_name
+    print(ochre_output_file_path)
         
     properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
     properties_file = get_filename(ochre_output_file_path, properties_file_key)           
@@ -259,8 +262,9 @@ def load_ochre_outputs(file_path_name, ochre_controls):
     b_matrix_file = get_filename(ochre_output_file_path, envelope_matrixB_key)
     b_matrix = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_file), index_col=0)
     
-    hourly_inputs_key = get_dictionary_value(ochre_controls, "hourly_inputs", "_hourly.csv")
+    hourly_inputs_key = get_dictionary_value(ochre_controls, "hourly_inputs", "OCHRE_Run.csv")
     hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
+    print(hourly_inputs_file)
     hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
 
     water_tank_matrixA_key = get_dictionary_value(ochre_controls, "water_tank_matrixA", "_Water Tank_matrixA.csv")

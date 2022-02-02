@@ -48,23 +48,40 @@ def main():
     api_keys = inputs["API Keys"]
     api_keys = dict(zip(api_keys.key_name, api_keys.key_val))
     
-    
 
+
+    #%%
+    if "resstock_output_main_folder" not in filepaths:
+            filepaths["resstock_output_main_folder"] = "ResStock"
+            
+    if ("resstock_yaml" in filepaths and args.all or args.buildstock):
+        run_resstock(main_folder, filepaths["resstock_yaml"], filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
+                          simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
+    elif args.buildstock:
+        if os.path.exists("resstock.yml"):
+            print("No resstock yaml file specified. Defaulting to resstock.yml in main folder")
+           
+            run_resstock(main_folder, "resstock.yml", filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
+                        simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
+        else:
+            print("Could not fine resstock.yml file. Please specify name in File Paths tab.")
+    
     #Set OCHRE values
     if "OCHRE" in inputs:
         ochre_controls = inputs["OCHRE"]
         ochre_controls = dict(zip(ochre_controls.ochre_type, ochre_controls.ochre_value))
     else:
         ochre_controls = {}
-        
-    #%%
+
+    if "ochre_input_main_folder" in filepaths:
+        ochre_controls["ochre_input_main_folder"] = filepaths["ochre_input_main_folder"]
+    else:
+        ochre_controls["ochre_input_main_folder"] = filepaths["resstock_output_main_folder"]
+    if "ochre_output_main_folder" in filepaths:
+        ochre_controls["ochre_output_main_folder"] = filepaths["ochre_output_main_folder"]
     
-    if ("resstock_yaml" in filepaths and args.all) or args.buildstock:
-        run_resstock(main_folder, filepaths["resstock_yaml"], filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
-                          simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv", "results_annual.csv"))
-    
-    
-    if ("OCHRE" in inputs and args.all) or args.ochre:
+    if args.all or args.ochre:
+        print("Running OCHRE")
         run_ochre(ochre_controls)
     
     if args.posts or args.all:

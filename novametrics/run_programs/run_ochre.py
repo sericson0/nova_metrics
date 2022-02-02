@@ -19,8 +19,8 @@ def run_ochre(ochre_controls):
     
     Results saved in same subfolder structure as inputs.
     """
-    input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "OCHRE Inputs")
-    output_main_folder = get_dictionary_value(ochre_controls, "ochre_outputs_main_folder", "OCHRE Outputs")
+    input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "ResStock")
+    output_main_folder = get_dictionary_value(ochre_controls, "ochre_outputs_main_folder", "OCHRE")
     ochre_weather_file = get_dictionary_value(ochre_controls, "weather_file_path", "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip")
     properties_ext = get_dictionary_value(ochre_controls, "properties_file", "in.xml")
     schedule_ext = get_dictionary_value(ochre_controls, "schedule_inputs", "schedules.csv")

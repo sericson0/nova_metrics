@@ -111,7 +111,7 @@ def run_reopt(post_folder, results_folder, api_key, root_url = 'https://develope
         Path(results_dir).mkdir(parents=True, exist_ok=True)
 
         if (not os.path.isfile(results_file)) or overwrite:
-            print("Running REopt for", post_name)
+            print("Running REopt for", post_dir, "-", post_name)
             post = load_post(post_dir, post_name)
             reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
             save_post(reopt_results, results_dir, post_name)

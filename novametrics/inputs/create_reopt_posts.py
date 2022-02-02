@@ -59,12 +59,11 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
             if ochre_controls.get("ochre_outputs_main_folder"):
                 ochre_outputs_main_folder = ochre_controls["ochre_outputs_main_folder"]
             else:
-                print("No OCHRE folder is specified, defaulting to folder name OCHRE. Specify different folder through OCHRE inputs sheet.")
                 ochre_outputs_main_folder = "OCHRE"
                 
             buildings = os.listdir(ochre_outputs_main_folder)
             for b in buildings:
-                input_vals["ochre_folder"] = b
+                input_vals["ochre_folder"] = os.path.join(ochre_outputs_main_folder, b)
                 input_vals["output_subfolder"] = b
                 create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
         else:
@@ -118,7 +117,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(pd.read_csv(input_vals["load_file"], header=None).iloc[:,0])
 
     #Load ochre outputs
-    if ("ochre_folder" in input_vals) and  not_none(input_vals["ochre_folder"]):
+    if ("ochre_folder" in input_vals) and not_none(input_vals["ochre_folder"]):
         ochre_outputs = load_ochre_outputs(input_vals["ochre_folder"], ochre_controls)
         parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
         
