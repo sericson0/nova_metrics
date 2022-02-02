@@ -14,6 +14,7 @@ Note: this project is under active development.
    :maxdepth: 2
    :caption: Contents:
    
+   installation
    tutorial
    inputs
    running_a_project
