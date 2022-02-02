@@ -274,7 +274,12 @@ def wh_post(post, ochre_outputs, ochre_controls):
     
     
     if (parsed_prop["water heater fuel"] == "None") or ((erwh_size_kw + hpwh_size_kw) <= 0.01):
-        return None
+        if 'FlexTechERWH' not in post['Scenario']['Site']:
+            post['Scenario']['Site']['FlexTechERWH'] = {}
+        post['Scenario']['Site']['FlexTechERWH']['size_kw'] = erwh_size_kw
+            
+        if 'FlexTechHPWH' not in post['Scenario']['Site']:
+            post['Scenario']['Site']['FlexTechHPWH'] = {'size_kw': 0.0, "prod_factor_series_kw": [], "cop": []}
     
     else:
         wh_temperature_lower_bound = get_dictionary_value(ochre_controls, "wh_temperature_lower_bound", 30)
