@@ -216,21 +216,21 @@ def parse_properties(file_path):
 
     return out
 
-def load_ochre_outputs(file_path_name, ochre_controls):
+def load_ochre_outputs(ochre_controls):
     """
     Return list of OCHRE building model output results.
          
     Parameters
     ----------
-    file_path_name : str
-        Path to OCHRE output folder relative to OCHRE main folder. 
     ochre_controls : dict
      Dictionary containing specifications for strings to match filenames.
      OCHRE output folder filenames default to:
+         ochre_outputs_main_folder - OCHRE
+         ochre_outputs_subfolder - No default
          properties_file - .properties
          envelope_matrixA - _Envelope_matrixA.csv
          envelope_matrixB - _Envelope_matrixB.csv
-         hourly_inputs - _hourly.csv
+         hourly_inputs - OCHRE_Run.csv
          water_tank_matrixA - _Water Tank_matrixA.csv
          water_tank_matrixB - _Water Tank_matrixB.csv
     
@@ -239,16 +239,8 @@ def load_ochre_outputs(file_path_name, ochre_controls):
     list
     [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     """
-    # if ochre_controls.get("ochre_inputs_main_folder"):
-    #     ochre_input_file_path = os.path.join(ochre_controls["ochre_inputs_main_folder"], file_path_name)
-    # else:
-    #     ochre_input_file_path = file_path_name
-
-    if ochre_controls.get("ochre_outputs_main_folder"):
-        ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], file_path_name)
-    else:
-        ochre_output_file_path = file_path_name
-        
+    ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], ochre_controls["ochre_outputs_subfolder"])    
+    
     properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
     properties_file = get_filename(ochre_output_file_path, properties_file_key)           
     parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))

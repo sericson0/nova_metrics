@@ -46,7 +46,7 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
         path to folder where solar profiles are saved.
     pv_watts_api_key : str
         key to download solar proviles from PV watts.
-    ochre_controls : dict
+    ochre_controls_dict : dict
         optional dictionary of OCHRE building model output values (such as folder path).
     """
     pathlib.Path(solar_profile_folder).mkdir(parents=True, exist_ok=True)
@@ -55,18 +55,21 @@ def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, mai
     defaults = load_post(inputs_folder, default_values_file)
     
     for i, input_vals in inputs_df.iterrows():
+        ochre_controls["use_ochre_outputs"] = False
+        
+        if not ochre_controls.get("ochre_outputs_main_folder"):
+            ochre_controls["ochre_outputs_main_folder"] = "OCHRE"
         if by_building:
-            if ochre_controls.get("ochre_outputs_main_folder"):
-                ochre_outputs_main_folder = ochre_controls["ochre_outputs_main_folder"]
-            else:
-                ochre_outputs_main_folder = "OCHRE"
-                
-            buildings = os.listdir(ochre_outputs_main_folder)
+            ochre_controls["use_ochre_outputs"] = True
+            buildings = os.listdir(ochre_controls["ochre_outputs_main_folder"])
             for b in buildings:
-                input_vals["ochre_folder"] = os.path.join(ochre_outputs_main_folder, b)
+                ochre_controls["ochre_outputs_subfolder"] = b
                 input_vals["output_subfolder"] = b
                 create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
         else:
+            if ("ochre_folder" in input_vals) and not_none(input_vals["ochre_folder"]):
+                ochre_controls["use_ochre_outputs"] = True
+                ochre_controls["ochre_outputs_subfolder"] = input_vals["ochre_folder"]
             create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_prod_factor, solar_profile_folder, pv_watts_api_key, ochre_controls)
             
       
@@ -116,8 +119,8 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(pd.read_csv(input_vals["load_file"], header=None).iloc[:,0])
 
     #Load ochre outputs
-    if ("ochre_folder" in input_vals) and not_none(input_vals["ochre_folder"]):
-        ochre_outputs = load_ochre_outputs(input_vals["ochre_folder"], ochre_controls)
+    if ochre_controls["use_ochre_outputs"]:
+        ochre_outputs = load_ochre_outputs(ochre_controls)
         parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
         
         if "LoadProfile" not in post["Scenario"]["Site"]:
