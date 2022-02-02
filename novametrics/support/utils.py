@@ -40,12 +40,24 @@ def parse_properties(properties_file, **kwargs):
     return out
 
 
-def get_filename(path, end_condition):
-    filename = [f for f in os.listdir(path) if f.endswith(end_condition)]
-    if len(filename) != 1:
-        print('More than one file type matches condition')
+def get_filename(path, end_conditions):
+    if type(end_conditions) == list:
+        end_condition_list = end_conditions
     else:
-        filename = filename[0]
+        end_condition_list = [end_conditions]
+        
+    for end_condition in end_condition_list:
+        filename = [f for f in os.listdir(path) if f.endswith(end_condition)]
+        if len(filename) == 1:
+            return filename[0]
+        elif len(filename) > 1:
+            print(f"Warning! Multiple names {filename} match the end condition {end_condition}. Using {filename[0]}")
+            return filename[0]
+        else:
+            continue
+
+    raise Exception(f"Error in get_filename. No filenames matched any of the end conditions in {end_condition_list}")
+    
     return filename
 
 

@@ -73,12 +73,13 @@ def main():
     else:
         ochre_controls = {}
 
-    if "ochre_input_main_folder" in filepaths:
-        ochre_controls["ochre_input_main_folder"] = filepaths["ochre_input_main_folder"]
-    else:
-        ochre_controls["ochre_input_main_folder"] = filepaths["resstock_output_main_folder"]
-    if "ochre_output_main_folder" in filepaths:
-        ochre_controls["ochre_output_main_folder"] = filepaths["ochre_output_main_folder"]
+    if "ochre_inputs_main_folder" in filepaths:
+        ochre_controls["ochre_inputs_main_folder"] = filepaths["ochre_inputs_main_folder"]
+    elif "resstock_outputs_main_folder" in filepaths:
+        ochre_controls["ochre_inputs_main_folder"] = filepaths["resstock_outputs_main_folder"]
+        
+    if "ochre_outputs_main_folder" in filepaths:
+        ochre_controls["ochre_outputs_main_folder"] = filepaths["ochre_outputs_main_folder"]
     
     if args.all or args.ochre:
         print("Running OCHRE")

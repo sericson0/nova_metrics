@@ -39,11 +39,11 @@ def run_ochre(ochre_controls):
         
         ##TODO setup optional download from nsrdb
         # download_nsrdb(ochre_weather_file, location_vals["latitude"], location_vals["longitude"], api_keys["nrel_api_key"])
-        
-        properties_file = os.path.abspath(os.path.join(input_path, get_filename(input_path, properties_ext)))
+        properties_filename = get_filename(input_path, [properties_ext, "in.xml", "in.yaml", ".xml", ".yaml"])
+        properties_file = os.path.abspath(os.path.join(input_path, properties_filename))
         properties_yaml_name = properties_file.rsplit(".", 1)[0] + ".yaml"
         
-        schedule_file = os.path.abspath(os.path.join(input_path, get_filename(input_path, schedule_ext)))
+        schedule_file = os.path.abspath(os.path.join(input_path, get_filename(input_path, [schedule_ext, "schedules.csv", ".csv"])))
         simulation_name = "OCHRE_Run"
 
         # ochre_rate_file = os.path.join(location_inputs_folder, building, ' Rate.csv')
@@ -51,10 +51,10 @@ def run_ochre(ochre_controls):
         # print(f"properties_file: {properties_file}, schedule_file: {schedule_file}, weather file: {ochre_weather_file}, default_inputs: {default_inputs}, outputs: {output_path}")
         try:
             run_ochre_single_case(simulation_name, properties_file, schedule_file, ochre_weather_file, default_inputs, output_path)
-            shutil.move(properties_yaml_name, output_path)
+            shutil.copy(properties_yaml_name, output_path)
         except Exception as e:
             print(f"OCHRE run {input_path} failed. Error {sys.exc_info()[0]} {e}.")
-            shutil.rmtree(output_path)
+            # shutil.rmtree(output_path)
         
         
 
