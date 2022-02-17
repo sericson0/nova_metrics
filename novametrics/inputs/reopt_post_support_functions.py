@@ -2,8 +2,8 @@
 # coding: utf-8
 import os 
 import pandas as pd
-from novametrics.support.utils import not_none
-from novametrics.apiquery.download_pv_watts import download_pv_watts
+from support.utils import not_none
+from apiquery.download_pv_watts import download_pv_watts
 # import collections.abc
 
 #%%

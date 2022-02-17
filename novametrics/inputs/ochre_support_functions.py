@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import yaml
-from novametrics.support.utils import load_post, not_none, get_dictionary_value, get_filename
+from support.utils import load_post, not_none, get_dictionary_value, get_filename
 #%%
 
 def get_properties_file(file_path):

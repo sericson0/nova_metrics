@@ -4,7 +4,7 @@ Collection of functions to subset REopt results to facilitate metrics calculatio
 import os 
 import json
 import numpy as np
-from novametrics.analyze_results.simulate_outages import simulate_outages
+from analyze_results.simulate_outages import simulate_outages
 HOURS = 8760
 #%%
 #Code subsets REopt results for final metrics generation. 

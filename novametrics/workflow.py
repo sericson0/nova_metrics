@@ -7,11 +7,11 @@ import sys
 # sys.path.insert(1, "../")
 import pandas as pd
 import argparse
-from novametrics.inputs.create_reopt_posts import create_reopt_posts
-from novametrics.run_programs.run_reopt import run_reopt
-from novametrics.run_programs.run_ochre import run_ochre
-from novametrics.run_programs.run_resstock import run_resstock
-from novametrics.analyze_results.generate_metrics import generate_metrics, generate_timeseries
+from inputs.create_reopt_posts import create_reopt_posts
+from run_programs.run_reopt import run_reopt
+#from run_programs.run_ochre import run_ochre
+#from run_programs.run_resstock import run_resstock
+from analyze_results.generate_metrics import generate_metrics, generate_timeseries
 #%%
 def main():
     parser = argparse.ArgumentParser()

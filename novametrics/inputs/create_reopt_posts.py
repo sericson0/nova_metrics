@@ -12,9 +12,9 @@ import copy
 # import collections.abc
 import pathlib
 # import novametrics.apiquery.find_urdb as Find_URDB
-from novametrics.support.utils import load_post, not_none
-from novametrics.inputs.reopt_post_support_functions import get_pv_prod_factor
-from novametrics.inputs.ochre_support_functions import load_ochre_outputs, wh_post, hvac_post
+from support.utils import load_post, not_none
+from inputs.reopt_post_support_functions import get_pv_prod_factor
+from inputs.ochre_support_functions import load_ochre_outputs, wh_post, hvac_post
 #%%
 
 def create_reopt_posts(inputs_folder, inputs_file_name, default_values_file, main_output_folder, by_building = False, add_pv_prod_factor = True, solar_profile_folder = "/.", pv_watts_api_key = "",
@@ -154,6 +154,8 @@ def update_post(post, name, val):
     else:
         if type(val) is np.int64:
             val = int(val)
+        if type(val) is np.str and "null" in val:
+            val = None
         if name in ["post_name", "output_subfolder", "ochre_folder", "load_file", "solar_production_factor_file", "WH", "HVAC"]:
             pass
         elif "ScenarioLevel|" in name:

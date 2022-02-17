@@ -23,8 +23,8 @@ import glob
 import numpy as np
 import pandas as pd
 pd.set_option('mode.chained_assignment', None)
-from novametrics.analyze_results.extract_results import extract_results
-from novametrics.support.utils import not_none
+from analyze_results.extract_results import extract_results
+from support.utils import not_none
 HOURS = 8760
 #%%
 def cover_factor_metrics(results):

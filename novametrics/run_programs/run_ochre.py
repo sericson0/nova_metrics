@@ -10,7 +10,7 @@ from pathlib import Path
 # os.chdir(os.path.dirname(__file__))
 from ochre import Dwelling
 from ochre.FileIO import default_input_path
-from novametrics.support.utils import get_dictionary_value, get_filename
+from support.utils import get_dictionary_value, get_filename
 # from nova_metrics.apiquery.download_nsrdb import download_nsrdb
 #%%
 def run_ochre(ochre_controls):

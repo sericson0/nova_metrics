@@ -1,0 +1,80 @@
+Metric,Value
+Total Electric Energy (kWh),6413.365684744684
+Total Gas Energy (therms),0.0
+Total Reactive Energy (kVARh),1121.336789357791
+Average Electric Power (kW),0.7321193704046448
+Peak Electric Power (kW),3.807956265987201
+Peak Electric Power - 15 min avg (kW),3.807956265987201
+Peak Electric Power - 30 min avg (kW),3.807956265987201
+Peak Electric Power - 1 hour avg (kW),3.807956265987201
+HVAC Heating Electric Energy (kWh),1926.5126818436902
+HVAC Cooling Electric Energy (kWh),124.40319577483118
+Water Heating Electric Energy (kWh),1353.1725238984293
+Other Electric Energy (kWh),3009.2772832277324
+HVAC Heating Reactive Energy (kVARh),0.0
+HVAC Cooling Reactive Energy (kVARh),0.0
+Water Heating Reactive Energy (kVARh),339.13700231495454
+Other Reactive Energy (kVARh),782.199787042836
+Average Temperature - Indoor (C),21.701706744805353
+Std. Dev. Temperature - Indoor (C),2.0669829637349064
+Average Temperature - Foundation (C),8.786093649750764
+Std. Dev. Temperature - Foundation (C),7.186462728998908
+Average Temperature - Attic (C),12.315052890721502
+Std. Dev. Temperature - Attic (C),14.217792132252473
+Unmet Heating Load (C-hours),651.2012640653869
+Unmet Cooling Load (C-hours),0.0
+Total HVAC Heating Delivered (kWh),6328.004337153363
+Average HVAC Heating COP (-),4.134227638237948
+Average HVAC Heating SHR (-),1.0
+Average HVAC Heating Duct Efficiency (-),1.0
+Average HVAC Heating Capacity (kW),1.1504154285061443
+Total HVAC Cooling Delivered (kWh),383.3944337903663
+Average HVAC Cooling COP (-),3.6686409879676236
+Average HVAC Cooling SHR (-),0.8826916258649302
+Average HVAC Cooling Duct Efficiency (-),0.9999999999999997
+Average HVAC Cooling Capacity (kW),0.508736187817603
+Total Water Heating Delivered (kWh),4242.648500326432
+Average Water Heating COP (-),3.4863279799834452
+"Total Hot Water Unmet Demand, Showers (kWh)",52.782161003788204
+Total Hot Water Delivered (gal/day),62.97856757803103
+Total Hot Water Delivered (kWh),3854.4374554701562
+Lighting Electric Energy (kWh),500.649178861319
+Exterior Lighting Electric Energy (kWh),84.58016561691625
+Range Electric Energy (kWh),500.22786660382053
+Dishwasher Electric Energy (kWh),0.0
+Refrigerator Electric Energy (kWh),348.2799673330076
+Clothes Washer Electric Energy (kWh),36.34532136150993
+Clothes Dryer Electric Energy (kWh),646.8788668987272
+MELs Electric Energy (kWh),515.0962346669371
+Ventilation Fan Electric Energy (kWh),377.2196818854931
+Lighting Reactive Energy (kVARh),0.0
+Exterior Lighting Reactive Energy (kVARh),0.0
+Range Reactive Energy (kVARh),0.0
+Dishwasher Reactive Energy (kVARh),0.0
+Refrigerator Reactive Energy (kVARh),261.2099754997552
+Clothes Washer Reactive Energy (kVARh),42.492389217970484
+Clothes Dryer Reactive Energy (kVARh),92.17524632490645
+MELs Reactive Energy (kVARh),386.3221760002026
+Ventilation Fan Reactive Energy (kVARh),0.0
+"Water Heating ""Heat Pump On"" Cycles",1.0
+"Water Heating ""Lower On"" Cycles",0.0
+"Water Heating ""Upper On"" Cycles",0.0
+"HVAC Heating ""HP On"" Cycles",113.0
+"HVAC Heating ""HP and ER On"" Cycles",26.0
+"HVAC Heating ""ER On"" Cycles",0.0
+HVAC Cooling Cycles,90.0
+HVAC Heating Main Energy (kWh),1521.6843696434871
+HVAC Heating Fan Energy (kWh),59.390667223391794
+HVAC Heating ER Energy (kWh),-5.412355023188907
+HVAC Cooling Main Energy (kWh),119.81223229965384
+HVAC Cooling Fan Energy (kWh),4.590963475177294
+Average Voltage (-),1.0
+Average Relative Humidity - Indoor (-),0.3861578191019132
+Average Humidity Ratio - Indoor (-),0.006589300116558877
+Average HVAC Heating Mode Value (-),0.6220319634703196
+Average HVAC Heating Speed (-),0.701675148689304
+Average HVAC Cooling Mode Value (-),-0.09863013698630137
+Average HVAC Cooling Speed (-),0.02775486625926902
+Average Water Heating Mode Value (-),1.0
+Average Water Heating Heat Pump On Fraction (-),0.29547497719560883
+Average Water Heating Heat Pump COP (-),4.1816500635468845

@@ -6,7 +6,7 @@ import time
 import os 
 from pathlib import Path
 
-from novametrics.support.utils import load_post, save_post
+from support.utils import load_post, save_post
 #%%
 def reo_optimize(post, API_KEY, root_url='https://developer.nrel.gov/api/reopt', poll_interval=10):
     """
