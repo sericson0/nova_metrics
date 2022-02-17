@@ -10072,6 +10072,35 @@
           "fixedchargefirstmeter": 0.641,
           "fixedchargeunits": "$/day"
         },
+        "add_blended_rates_to_urdb_rate": false,
+        "blended_monthly_rates_us_dollars_per_kwh": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blended_monthly_demand_charges_us_dollars_per_kw": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
         "coincident_peak_load_active_timesteps": [
           [
             498.0
@@ -18919,7 +18948,8 @@
         "canGridCharge": true,
         "soc_min_pct": 0.1,
         "soc_init_pct": 0.92
-      }
+      },
+      "timeout_seconds": 4200
     },
     "description": "Actual loads - net load"
   }

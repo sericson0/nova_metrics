@@ -10072,42 +10072,70 @@
           "fixedchargefirstmeter": 0.641,
           "fixedchargeunits": "$/day"
         },
+        "blended_monthly_rates_us_dollars_per_kwh": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "blended_monthly_demand_charges_us_dollars_per_kw": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
         "coincident_peak_load_active_timesteps": [
           [
-            210.0
+            210
           ],
           [
-            955.0
+            955
           ],
           [
-            1507.0
+            1507
           ],
           [
-            2252.0
+            2252
           ],
           [
-            3308.0
+            3308
           ],
           [
-            4071.0
+            4071
           ],
           [
-            4797.0
+            4797
           ],
           [
-            5610.0
+            5610
           ],
           [
-            6452.0
+            6452
           ],
           [
-            6763.0
+            6763
           ],
           [
-            7530.0
+            7530
           ],
           [
-            8706.0
+            8706
           ]
         ],
         "coincident_peak_load_charge_us_dollars_per_kw": [
@@ -18919,7 +18947,8 @@
         "canGridCharge": true,
         "soc_min_pct": 0.1,
         "soc_init_pct": 0.92
-      }
+      },
+      "timeout_seconds": 4200
     },
     "description": "Sized techs - optimal dispatch for customer grid and climate benefits"
   }
