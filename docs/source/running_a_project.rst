@@ -58,3 +58,5 @@ Run OCHRE
 The workflow will run OCHRE simulations if --ochre or --all is called. The OCHRE sheet can specify specific OCHRE controls such as where OCHRE inputs and outputs are saved to, and default values for the building simulations. *ochre_inputs_main_folder* can be specified in the the Inputs.xlsx File Paths tab. If unspecified then will check if *resstock_output_main_folder* is in the File Paths, and if not will default to **./ResStock**. OCHRE will simulate all buildings in the ochre inputs folder.  
 
 Each input contains a properties file (generally either a .xml or a .yaml file), and a schedule file (generally denoted by <name>_schedule.csv). The workflow determines individual buildings as any folder which contains files, so building inputs can be added in a nested folder strucutre of any depth. The folder strucutre will be presered when saving outputs. 
+
+Outputs maintain the same nested folder structure as inputs. 

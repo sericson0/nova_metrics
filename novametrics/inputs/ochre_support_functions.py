@@ -21,7 +21,8 @@ def get_properties_file(file_path):
     out : dic
         Dictionary of OCHRE property values for HVAC and water heater dispatch.
     """
-    d= {}
+    properties = {}
+    out = {}
     #TODO update to keep potential variations such as no HVAC cooling
     with open(file_path, 'r') as prop_file:
         for line in prop_file:
@@ -34,20 +35,79 @@ def get_properties_file(file_path):
                 # convert to string, float, or list
                 val = line_split[1].strip()
                 try:
-                    d[key] = eval(val)
+                    properties[key] = eval(val)
                 except (NameError, SyntaxError):
-                    d[key] = val
+                    properties[key] = val
             elif len(line_split) > 2:
                 # convert to dict (all should be floats)
                 line_list = '='.join(line_split[1:]).split('   ')
                 line_list = [tuple(s.split('=')) for s in line_list]
-                d[key] = {k.strip(): float(v.strip()) for (k, v) in line_list}
-    out_vals = ['heating fuel', 'heating number of speeds', 'heating fan power (W/cfm)', 'heating airflow rate (cfm)',
-                'heating capacity (W)', 'heating EIR', 'heating duct dse', 'cooling fuel', 'cooling number of speeds',
-                'cooling fan power (W/cfm)', 'cooling airflow rate (cfm)', 'cooling capacity (W)', 'cooling EIR',
-                'cooling duct dse', 'water heater fuel', 'rated input power (W)', 'water heater type']
-    out = {key: d[key] for key in out_vals}
-    
+                properties[key] = {k.strip(): float(v.strip()) for (k, v) in line_list}
+
+
+
+    if "heating fuel" in properties:
+        out['heating fuel'] = properties["heating_fuel"]
+        if out["heating fuel"] == "Electric":
+            out["heating fuel"] = "Electricity"
+
+        out['heating number of speeds'] = properties["heating number of speeds"]
+        out['heating fan power (W/cfm)'] = properties["heating fan power (W/cfm)"]
+        out['heating airflow rate (cfm)'] = properties["heating airflow rate (cfm)"]
+        out['heating capacity (W)'] = properties["heating capacity (W)"]
+        out['heating EIR'] = properties["heating EIR"]
+        if "heating duct dse" in properties:
+            out['heating duct dse'] = properties["heating duct dse"]
+        else:
+            out["heating duct dse"] = 1
+            
+    else:
+        print(f"Building {file_path} has no HVAC Heating.")
+        out['heating fuel'] = "None"
+        out['heating number of speeds'] = 1
+        out['heating fan power (W/cfm)'] = 0
+        out['heating airflow rate (cfm)'] = 0
+        out['heating capacity (W)'] = 0
+        out['heating EIR'] = 1
+        out['heating duct dse'] = 1
+
+
+    if "cooling fuel" in properties:
+        out['cooling fuel'] = properties["cooling fuel"]
+        if out["cooling fuel"] == "Electric":
+            out["cooling fuel"] = "Electricity"
+        out['cooling number of speeds'] = properties["cooling number of speeds"]
+        out['cooling fan power (W/cfm)'] = properties["cooling fan power (W/cfm)"]
+        out['cooling airflow rate (cfm)'] = properties["cooling airflow rate (cfm)"]
+        out['cooling capacity (W)'] = properties["cooling capacity (W)"]
+        out['cooling EIR'] = properties["cooling EIR"]
+        if "cooling duct dse" in properties:
+            out['cooling duct dse'] = properties["cooling duct dse"]
+        else:
+            out['cooling duct dse'] = 1
+    else:
+        print("Building has no HVAC Cooling")
+        out['cooling fuel'] = "None"
+        out['cooling number of speeds'] = 1
+        out['cooling fan power (W/cfm)'] = 0
+        out['cooling airflow rate (cfm)'] = 0
+        out['cooling capacity (W)'] = 0
+        out['cooling EIR'] = 1
+        out['cooling duct dse'] = 1
+        
+        
+    if "water heater fuel" in properties:    
+        out['water heater fuel'] = properties["water heater fuel"]
+        if out["water heater fuel"] == "Electric":
+            out["water heater fuel"] = "Electricity"
+        out['rated input power (W)'] = properties["rated input power (W)"]
+        out['water heater type'] = properties["water heater type"]
+    else:
+        print("No Water Heating")
+        out['water heater fuel'] = "None"
+        out['rated input power (W)'] = 0
+        out['water heater type'] = "None"
+        
     return out
 
 
