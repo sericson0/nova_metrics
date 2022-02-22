@@ -1312,86 +1312,10 @@
 				"fixedchargeunits": "$/day"
 			},
 			"add_blended_rates_to_urdb_rate": false,
-			"blended_monthly_rates_us_dollars_per_kwh": [
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0
-			  ],
-			"blended_monthly_demand_charges_us_dollars_per_kw": [
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0,
-				0.0
-			  ],
-			"coincident_peak_load_active_timesteps": [
-				[
-				  498.0
-				],
-				[
-				  1026.0
-				],
-				[
-				  1579.0
-				],
-				[
-				  2348.0
-				],
-				[
-				  3547.0
-				],
-				[
-				  4269.0
-				],
-				[
-				  4821.0
-				],
-				[
-				  5539.0
-				],
-				[
-				  6379.0
-				],
-				[
-				  6955.0
-				],
-				[
-				  7602.0
-				],
-				[
-				  8456.0
-				]
-			],
-			"coincident_peak_load_charge_us_dollars_per_kw": [
-			9.52,
-			9.52,
-			9.52,
-			9.52,
-			9.52,
-			9.64,
-			9.64,
-			9.64,
-			9.64,
-			9.64,
-			9.64,
-			9.64
-			],
+			"blended_monthly_rates_us_dollars_per_kwh": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],
+        	"blended_monthly_demand_charges_us_dollars_per_kw": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0], 
+			"coincident_peak_load_active_timesteps": [[498.0],[1026.0],[1579.0],[2348.0],[3547.0],[4269.0],[4821.0],[5539.0],[6379.0],[6955.0],[7602.0],[8456.0]],
+			"coincident_peak_load_charge_us_dollars_per_kw": [9.52,9.52,9.52,9.52,9.52,9.64,9.64,9.64,9.64,9.64,9.64,9.64],
 			"net_metering_limit_kw": 500.0,
 			"wholesale_rate_above_site_load_us_dollars_per_kwh": 0.1765
 		},
@@ -1424,9 +1348,7 @@
 			"canGridCharge": true,
 			"soc_min_pct": 0.1,
 			"soc_init_pct": 0.92
-		},
-		"timeout_seconds": 4200
+		}
 	}
 }
 }
-

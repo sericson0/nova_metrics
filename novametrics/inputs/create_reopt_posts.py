@@ -127,9 +127,9 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
             post["Scenario"]["Site"]["LoadProfile"] = {}
         post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
         
-        if "WH" in input_vals and not_none(input_vals["WH"]):
+        if "WH" in input_vals and (input_vals["WH"]):
             wh_post(post, ochre_outputs, ochre_controls) # wh_lower_bound, wh_upper_bound, wh_comfort_limit)
-        if "HVAC" in input_vals and not_none(input_vals["WH"]):
+        if "HVAC" in input_vals and (input_vals["HVAC"]):
             hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
                 
     #Output subfolder allows for folder structure for REopt posts

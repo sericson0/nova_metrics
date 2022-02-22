@@ -18948,8 +18948,7 @@
         "canGridCharge": true,
         "soc_min_pct": 0.1,
         "soc_init_pct": 0.92
-      },
-      "timeout_seconds": 4200
+      }
     },
     "description": "Actual loads - net load but PV separate prodfac"
   }

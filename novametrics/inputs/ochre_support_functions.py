@@ -72,7 +72,7 @@ def get_yaml_file(file_path):
     if "HVAC Heating" in properties:
         out['heating fuel'] = properties["HVAC Heating"]["Fuel"]
         if out["heating fuel"] == "Electric":
-            out["heating fuel"] = "Electricity"
+            out["heating fuel"] = "Electric"
         out['heating number of speeds'] = properties["HVAC Heating"]["Number of Speeds (-)"]
         out['heating fan power (W/cfm)'] = properties["HVAC Heating"]["Fan Power (W/cfm)"]
         out['heating airflow rate (cfm)'] = properties["HVAC Heating"]["Airflow Rate (cfm)"]
@@ -96,7 +96,7 @@ def get_yaml_file(file_path):
     if "HVAC Cooling" in properties:
         out['cooling fuel'] = properties["HVAC Cooling"]["Fuel"]
         if out["cooling fuel"] == "Electric":
-            out["cooling fuel"] = "Electricity"
+            out["cooling fuel"] = "Electric"
         out['cooling number of speeds'] = properties["HVAC Cooling"]["Number of Speeds (-)"]
         out['cooling fan power (W/cfm)'] = properties["HVAC Cooling"]["Fan Power (W/cfm)"]
         out['cooling airflow rate (cfm)'] = properties["HVAC Cooling"]["Airflow Rate (cfm)"]
@@ -120,7 +120,7 @@ def get_yaml_file(file_path):
     if "Water Heating" in properties:    
         out['water heater fuel'] = properties["Water Heating"]["Fuel"]
         if out["water heater fuel"] == "Electric":
-            out["water heater fuel"] = "Electricity"
+            out["water heater fuel"] = "Electric"
         out['rated input power (W)'] = properties["Water Heating"]["Capacity (W)"]
         out['water heater type'] = properties["HVAC Heating"]["Equipment Name"]
     else:
@@ -166,7 +166,7 @@ def parse_properties(file_path):
     out["hp_dse"] = prop_values['heating duct dse']
     heating_speed = prop_values["heating number of speeds"] -1 
     out["hp_size_heat"] = prop_values['heating capacity (W)'][heating_speed] / 1000
-    if prop_values['heating fuel'] == "Electricity":
+    if prop_values['heating fuel'] == "Electric":
         out["hp_size_kw"] = (prop_values['heating capacity (W)'][heating_speed] * 
                       prop_values['heating EIR'][heating_speed]) / 1000
         
@@ -184,7 +184,7 @@ def parse_properties(file_path):
     out["ac_dse"] = prop_values['cooling duct dse']
     
     
-    if prop_values['cooling fuel'] == "Electricity":
+    if prop_values['cooling fuel'] == "Electric":
         out["ac_size_kw"] = (prop_values['cooling capacity (W)'][cooling_speed] *
                       prop_values['cooling EIR'][cooling_speed]) / 1000
         out["ac_size_heat"] = prop_values['cooling capacity (W)'][cooling_speed] / 1000
@@ -203,7 +203,7 @@ def parse_properties(file_path):
 
     out["water heater fuel"] = prop_values['water heater fuel']
 
-    if prop_values['water heater fuel'] == "Electricity":
+    if prop_values['water heater fuel'] == "Electric":
         #TODO See why zero is needed in code below
         if type(prop_values['rated input power (W)']) == list:
             out["erwh_size_kw"] = prop_values['rated input power (W)'][0]/1000 
@@ -241,7 +241,7 @@ def load_ochre_outputs(ochre_controls):
     """
     ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], ochre_controls["ochre_outputs_subfolder"])    
     
-    properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
+    properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "model.properties")
     properties_file = get_filename(ochre_output_file_path, properties_file_key)           
     parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))
 
@@ -358,7 +358,7 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     
 
     
-    if parsed_prop['heating fuel'] == "Electricity":
+    if parsed_prop['heating fuel'] == "Electric":
         hp_cop = list(hourly_inputs.loc[:, 'HVAC Heating COP (-)'])
         try:
             er_on = hourly_inputs.loc[:, 'HVAC Heating ER Power (kW)']
@@ -370,7 +370,7 @@ def hvac_post(post, ochre_outputs, ochre_controls):
         hp_cop = [constant_heating_cop/parsed_prop["ac_dse"]]*n_timesteps
         er_on = pd.Series([-1]*n_timesteps) 
         
-    if parsed_prop['cooling fuel'] == "Electricity":
+    if parsed_prop['cooling fuel'] == "Electric":
         ac_shr = list(hourly_inputs.loc[:, 'HVAC Cooling SHR (-)'])
         if "FlexTechAC" not in post['Scenario']['Site']:
             post['Scenario']['Site']["FlexTechAC"] = {}
@@ -434,10 +434,10 @@ def hvac_post(post, ochre_outputs, ochre_controls):
     post['Scenario']['Site']['RC']['n_input_nodes'] = n_input_nodes_hvac
     post['Scenario']['Site']['RC']['injection_node'] = hvac_injection_node_num
     post['Scenario']['Site']['RC']['space_node'] = space_node_num
-    post['Scenario']['Site']['RC']['temperature_lower_bound'] = hvac_temperature_lower_bound
-    post['Scenario']['Site']['RC']['temperature_upper_bound'] = hvac_temperature_upper_bound
-    post['Scenario']['Site']['RC']['comfort_temp_lower_bound_degC'] = hvac_comfort_temp_lower_bound
-    post['Scenario']['Site']['RC']['comfort_temp_upper_bound_degC'] = hvac_comfort_temp_upper_bound
+    post['Scenario']['Site']['RC']['temperature_lower_bound'] = hvac_comfort_temp_lower_bound
+    post['Scenario']['Site']['RC']['temperature_upper_bound'] = hvac_comfort_temp_upper_bound
+    #post['Scenario']['Site']['RC']['comfort_temp_lower_bound_degC'] = hvac_comfort_temp_lower_bound
+    #post['Scenario']['Site']['RC']['comfort_temp_upper_bound_degC'] = hvac_comfort_temp_upper_bound
     
 
     post['Scenario']['Site']['FlexTechHP']['min_kw'] = parsed_prop["hp_size_kw"]

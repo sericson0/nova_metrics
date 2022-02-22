@@ -8858,7 +8858,7 @@
           9.52
         ],
         "net_metering_limit_kw": 500.0,
-        "wholesale_rate_above_site_load_us_dollars_per_kwh": 0.1765
+        "wholesale_rate_above_site_load_us_dollars_per_kwh": 1e-11
       },
       "PV": {
         "min_kw": 0.0,
@@ -17634,7 +17634,7 @@
           0.008368421,
           0.008316667
         ],
-        "azimuth": 135
+        "azimuth": 270
       },
       "Storage": {
         "min_kwh": 0.0,
@@ -17652,8 +17652,7 @@
         "canGridCharge": true,
         "soc_min_pct": 0.1,
         "soc_init_pct": 0.92
-      },
-      "timeout_seconds": 4200
+      }
     },
     "description": "Sized techs - optimal dispatch for grid benefits"
   }

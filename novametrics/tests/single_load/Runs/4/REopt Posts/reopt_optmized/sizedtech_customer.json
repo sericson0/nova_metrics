@@ -18879,7 +18879,7 @@
           0.008149123,
           0.008208333
         ],
-        "azimuth": 135
+        "azimuth": 90
       },
       "Storage": {
         "min_kwh": 0.0,
@@ -18897,8 +18897,7 @@
         "canGridCharge": true,
         "soc_min_pct": 0.1,
         "soc_init_pct": 0.92
-      },
-      "timeout_seconds": 4200
+      }
     },
     "description": "Sized techs - optimal dispatch for customer savings"
   }
