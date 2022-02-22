@@ -49,6 +49,7 @@ def run_ochre(ochre_controls):
         # ochre_rate_file = os.path.join(location_inputs_folder, building, ' Rate.csv')
         # ochre_water_draw_file = os.path.join(location_inputs_folder, building, building + "_water_file.csv")
         # print(f"properties_file: {properties_file}, schedule_file: {schedule_file}, weather file: {ochre_weather_file}, default_inputs: {default_inputs}, outputs: {output_path}")
+        print(f"Running OCHRE building {input_path}")
         try:
             run_ochre_single_case(simulation_name, properties_file, schedule_file, ochre_weather_file, default_inputs, output_path)
             shutil.copy(properties_yaml_name, output_path)
