@@ -121,16 +121,18 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
     #Load ochre outputs
     if ochre_controls["use_ochre_outputs"]:
         ochre_outputs = load_ochre_outputs(ochre_controls)
-        parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
-        
-        if "LoadProfile" not in post["Scenario"]["Site"]:
-            post["Scenario"]["Site"]["LoadProfile"] = {}
-        post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
-        
-        if "WH" in input_vals and not_none(input_vals["WH"]):
-            wh_post(post, ochre_outputs, ochre_controls) # wh_lower_bound, wh_upper_bound, wh_comfort_limit)
-        if "HVAC" in input_vals and not_none(input_vals["WH"]):
-            hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
+        #If OCHRE run fails then ochre_outputs will be []. In this case don't add OCHRE values
+        if ochre_outputs != []:
+            parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
+            
+            if "LoadProfile" not in post["Scenario"]["Site"]:
+                post["Scenario"]["Site"]["LoadProfile"] = {}
+            post['Scenario']['Site']['LoadProfile']['loads_kw'] = list(hourly_inputs.loc[:, 'Total Electric Power (kW)'])
+            
+            if "WH" in input_vals and not_none(input_vals["WH"]):
+                wh_post(post, ochre_outputs, ochre_controls) # wh_lower_bound, wh_upper_bound, wh_comfort_limit)
+            if "HVAC" in input_vals and not_none(input_vals["WH"]):
+                hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
                 
     #Output subfolder allows for folder structure for REopt posts
     if "output_subfolder" in input_vals and not_none(input_vals["output_subfolder"]):

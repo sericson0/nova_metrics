@@ -240,32 +240,36 @@ def load_ochre_outputs(ochre_controls):
     [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     """
     ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], ochre_controls["ochre_outputs_subfolder"])    
-    
     properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
-    properties_file = get_filename(ochre_output_file_path, properties_file_key)           
-    parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))
-
     envelope_matrixA_key = get_dictionary_value(ochre_controls, "envelope_matrixA", "_Envelope_matrixA.csv")
-    a_matrix_file = get_filename(ochre_output_file_path, envelope_matrixA_key)
-    a_matrix = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_file), index_col=0)
-
     envelope_matrixB_key = get_dictionary_value(ochre_controls, "envelope_matrixB", "_Envelope_matrixB.csv")
-    b_matrix_file = get_filename(ochre_output_file_path, envelope_matrixB_key)
-    b_matrix = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_file), index_col=0)
-    
     hourly_inputs_key = get_dictionary_value(ochre_controls, "hourly_inputs", "OCHRE_Run.csv")
-    hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
-    hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
-
     water_tank_matrixA_key = get_dictionary_value(ochre_controls, "water_tank_matrixA", "_Water Tank_matrixA.csv")
-    a_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixA_key)
-    a_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_wh_file), index_col=0)
-
     water_tank_matrixB_key = get_dictionary_value(ochre_controls, "water_tank_matrixB", "_Water Tank_matrixB.csv")
-    b_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixB_key)
-    b_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_wh_file), index_col=0)
 
-    return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
+    try:
+        properties_file = get_filename(ochre_output_file_path, properties_file_key)           
+        b_matrix_file = get_filename(ochre_output_file_path, envelope_matrixB_key)
+        a_matrix_file = get_filename(ochre_output_file_path, envelope_matrixA_key)
+        hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
+        a_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixA_key)
+        b_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixB_key)
+        
+        parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))
+        a_matrix = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_file), index_col=0)
+        b_matrix = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_file), index_col=0)
+        hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
+        a_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_wh_file), index_col=0)
+        b_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_wh_file), index_col=0)
+        return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
+    
+    except Exception as e: 
+        print(e)
+        return []
+
+
+    
+
 
 def wh_post(post, ochre_outputs, ochre_controls):
     parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
@@ -454,9 +458,9 @@ def get_fan_adjustment(fan_power_series, main_power_series):
     ratio=fan_power_series/main_power_series
     ratio=ratio.replace([np.inf, -np.inf], np.nan)
     ratio=ratio.dropna()
-    if round(max(ratio),4) != round(min(ratio),4):
-        print('Different fan power ratios:', max(ratio), min(ratio))
-    return max(ratio)
+    if round(max(ratio, default = 1),4) != round(min(ratio, default = 1),4):
+        print('Different fan power ratios:', max(ratio, default = 1), min(ratio, default = 1))
+    return max(ratio, default = 1)
 
 
 # ochre_controls = {"ochre_inputs_main_folder":"ResStock", "ochre_outputs_main_folder": "OCHRE", "properties_file" : "in.xml", 
