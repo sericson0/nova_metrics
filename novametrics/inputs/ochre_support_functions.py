@@ -409,10 +409,10 @@ def hvac_post(post, ochre_outputs, ochre_controls):
 
     parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
     
-    hvac_temperature_lower_bound = get_dictionary_value(ochre_controls, "hvac_temperature_lower_bound", 19.56)
-    hvac_temperature_upper_bound = get_dictionary_value(ochre_controls, "hvac_temperature_upper_bound", 25.6)
-    hvac_comfort_temp_lower_bound = get_dictionary_value(ochre_controls, "hvac_comfort_temp_lower_bound", 0)
-    hvac_comfort_temp_upper_bound = get_dictionary_value(ochre_controls, "hvac_comfort_temp_upper_bound", 40)
+    hvac_temperature_lower_bound = get_dictionary_value(ochre_controls, "hvac_temperature_lower_bound", 0)
+    hvac_temperature_upper_bound = get_dictionary_value(ochre_controls, "hvac_temperature_upper_bound", 40)
+    hvac_comfort_temp_lower_bound = get_dictionary_value(ochre_controls, "hvac_comfort_temp_lower_bound", 19.56)
+    hvac_comfort_temp_upper_bound = get_dictionary_value(ochre_controls, "hvac_comfort_temp_upper_bound", 25.6)
     
     
     
