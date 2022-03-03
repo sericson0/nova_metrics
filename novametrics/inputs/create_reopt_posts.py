@@ -136,6 +136,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
                 hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
         else:
             print(f"OCHRE outputs failed for {input_vals['post_name']}")
+            return None
                 
     #Output subfolder allows for folder structure for REopt posts
     if "output_subfolder" in input_vals and not_none(input_vals["output_subfolder"]):
