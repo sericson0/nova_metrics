@@ -78,7 +78,7 @@ def poller(url, poll_interval):
 #%%
 
 
-def run_reopt(post_folder, results_folder, api_key, root_url = 'https://developer.nrel.gov/api/reopt', overwrite = True, poll_interval = 10):
+def run_reopt(post_folder, results_folder, api_key, start_folder = 1, root_url = 'https://developer.nrel.gov/api/reopt', overwrite = True, poll_interval = 10):
     """
     Runs REopt posts in `post_folder` and saves results to `results_folder`
     
@@ -98,20 +98,28 @@ def run_reopt(post_folder, results_folder, api_key, root_url = 'https://develope
     poll_interval: int
         Seconds between poll query
     """
-    file_paths = list(Path(post_folder).rglob("*.json"))
-    path_list = [path.relative_to(post_folder) for path in file_paths]  
+    subfolders = next(os.walk(post_folder))[1]
+    if len(subfolders) == 0:
+        folder_list = [post_folder]
+    else:
+        folder_list = [os.path.join(post_folder, x) for x in subfolders]
+    for building_folder in folder_list[(start_folder-1):len(folder_list)]:
+        print("_"*60)
+        print(f"Running Reopt for {building_folder}")
+        file_paths = list(Path(building_folder).rglob("*.json"))
+        path_list = [path.relative_to(post_folder) for path in file_paths]  
+        
+        for path in path_list:
+            directory, post_name = os.path.split(path)
+            
+            post_dir = os.path.join(post_folder, directory)
+            results_dir = os.path.join(results_folder, directory)
+            results_file = os.path.join(results_folder, directory, post_name)
+            
+            Path(results_dir).mkdir(parents=True, exist_ok=True)
     
-    for path in path_list:
-        directory, post_name = os.path.split(path)
-        
-        post_dir = os.path.join(post_folder, directory)
-        results_dir = os.path.join(results_folder, directory)
-        results_file = os.path.join(results_folder, directory, post_name)
-        
-        Path(results_dir).mkdir(parents=True, exist_ok=True)
-
-        if (not os.path.isfile(results_file)) or overwrite:
-            print("Running REopt for", post_dir, "-", post_name)
-            post = load_post(post_dir, post_name)
-            reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
-            save_post(reopt_results, results_dir, post_name)
+            if (not os.path.isfile(results_file)) or overwrite:
+                print("Running REopt for", post_dir, "-", post_name)
+                post = load_post(post_dir, post_name)
+                reopt_results = reo_optimize(post, api_key, root_url=root_url, poll_interval=poll_interval)
+                save_post(reopt_results, results_dir, post_name)

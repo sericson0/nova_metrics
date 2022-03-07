@@ -45,14 +45,15 @@ def cover_factor_metrics(results):
 #%%
 def calculate_utility_metrics(results, grid_prices = []):
     if len(grid_prices) == 0:
-        return {"External-grid_peak_contribution": None, "External-average_grid_cost_dollars_per_kwh": None}
+        return {"External-grid_peak_contribution": None, "External-average_grid_cost_dollars_per_kwh": None, "External-home_load_during_peak": None}
     else:    
         d = {}
         net_load = results["load"]["net_load"]
         top_5_pct_num_hours = 438
         top_loads = np.mean(sorted(net_load, reverse=True)[:10])
-    
+
         top_grid_periods = sorted(range(len(net_load)), key=lambda i: grid_prices[i], reverse=True)[:top_5_pct_num_hours]
+        d["External-home_load_during_peak"] = top_grid_periods[0]
         
         load_during_peak_periods = np.mean([net_load[p] for p in top_grid_periods])
         grid_peak_contribution = load_during_peak_periods / top_loads
@@ -62,7 +63,7 @@ def calculate_utility_metrics(results, grid_prices = []):
         
     
         d["External-average_grid_cost_dollars_per_kwh"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])/sum(results["load"]["home_load"])
-        d["External-total_grid_cost_dollars"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])
+        d["External-annual_grid_cost_dollars"] = sum([results["load"]["net_load"][h]*grid_prices[h]/1000 for h in range(HOURS)])
         return d
 #%%
     
