@@ -25,11 +25,7 @@ def main():
     parser.add_argument("-k", "--keep_runs", action="store_false", help = "Does not overwrite runs. Defaults to overwriting.")
     parser.add_argument("-i", "--inputs_file_path", default = "Inputs.xlsx", help = "Optionally specify path to input xlsx file (relative to main folder).")
     parser.add_argument("-g", "--by_building", action = "store_true", help = "If specified then runs REopt post and metrics for each building type")
-<<<<<<< Updated upstream
     parser.add_argument("-s", "--start", type=int, nargs='?', default=1, help = "If specified then sets subfolder to begin running REopt")
-=======
-    parser.add_argument("-s", "--start", type=int, nargs='?', const=1, help = "If specified then sets subfolder to begin running REopt")
->>>>>>> Stashed changes
     args = parser.parse_args()
 
     main_folder = args.main_folder
