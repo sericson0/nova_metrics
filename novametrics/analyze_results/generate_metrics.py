@@ -312,7 +312,8 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
         if by_building:
             building_folders = os.listdir(reopt_results_folder)
             for building in building_folders:
-                metrics_results_list.append(get_reopt_metrics_single_case(building, inputs["results_name"][i]+".json", building, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
+                building_subfolder = os.path.join(reopt_results_folder, building)
+                metrics_results_list.append(get_reopt_metrics_single_case(building_subfolder, inputs["results_name"][i]+".json", building_subfolder, inputs["baseline_name"][i]+".json", baseline_type, wholesale_price_path))
         
         else:
             if "results_folder" in inputs and not_none(inputs["results_folder"][i]):
