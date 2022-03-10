@@ -190,6 +190,86 @@ def get_yaml_file(file_path):
         out['water heater type'] = "None"
         
     return out
+        
+# def get_yaml_file(file_path):
+#     """
+#     Parse .yaml OCHRE property file and return relevant values for REopt integration
+
+#     Parameters
+#     ----------
+#     file_path : str
+#         Path to .properties file.
+
+#     Returns
+#     -------
+#     out : dict
+#         Dictionary of OCHRE property values for HVAC and water heater dispatch.
+#     """
+#     with open(file_path) as f:
+#         properties = yaml.safe_load(f)
+
+#     out = {}
+#     if "HVAC Heating" in properties:
+#         out['heating fuel'] = properties["HVAC Heating"]["Fuel"]
+#         if out["heating fuel"] == "Electric":
+#             out["heating fuel"] = "Electricity"
+#         out['heating number of speeds'] = properties["HVAC Heating"]["Number of Speeds (-)"]
+#         out['heating fan power (W/cfm)'] = properties["HVAC Heating"]["Fan Power (W/cfm)"]
+#         out['heating airflow rate (cfm)'] = properties["HVAC Heating"]["Airflow Rate (cfm)"]
+#         out['heating capacity (W)'] = properties["HVAC Heating"]["Capacity (W)"]
+#         out['heating EIR'] = properties["HVAC Heating"]["EIR (-)"]
+#         if "Duct DSE (-)" in properties["HVAC Heating"]:
+#             out['heating duct dse'] = properties["HVAC Heating"]["Duct DSE (-)"]
+#         else:
+#             out["heating duct dse"] = 1
+            
+#     else:
+#         print(f"Building {file_path} has no HVAC Heating.")
+#         out['heating fuel'] = "None"
+#         out['heating number of speeds'] = 1
+#         out['heating fan power (W/cfm)'] = 0
+#         out['heating airflow rate (cfm)'] = 0
+#         out['heating capacity (W)'] = 0
+#         out['heating EIR'] = 1
+#         out['heating duct dse'] = 1
+        
+#     if "HVAC Cooling" in properties:
+#         out['cooling fuel'] = properties["HVAC Cooling"]["Fuel"]
+#         if out["cooling fuel"] == "Electric":
+#             out["cooling fuel"] = "Electricity"
+#         out['cooling number of speeds'] = properties["HVAC Cooling"]["Number of Speeds (-)"]
+#         out['cooling fan power (W/cfm)'] = properties["HVAC Cooling"]["Fan Power (W/cfm)"]
+#         out['cooling airflow rate (cfm)'] = properties["HVAC Cooling"]["Airflow Rate (cfm)"]
+#         out['cooling capacity (W)'] = properties["HVAC Cooling"]["Capacity (W)"]
+#         out['cooling EIR'] = properties["HVAC Cooling"]["EIR (-)"]
+#         if "Duct DSE (-)" in properties["HVAC Cooling"]:
+#             out['cooling duct dse'] = properties["HVAC Cooling"]["Duct DSE (-)"]
+#         else:
+#             out['cooling duct dse'] = 1
+#     else:
+#         print("Building has no HVAC Cooling")
+#         out['cooling fuel'] = "None"
+#         out['cooling number of speeds'] = 1
+#         out['cooling fan power (W/cfm)'] = 0
+#         out['cooling airflow rate (cfm)'] = 0
+#         out['cooling capacity (W)'] = 0
+#         out['cooling EIR'] = 1
+#         out['cooling duct dse'] = 1
+        
+        
+#     if "Water Heating" in properties:    
+#         out['water heater fuel'] = properties["Water Heating"]["Fuel"]
+#         if out["water heater fuel"] == "Electric":
+#             out["water heater fuel"] = "Electricity"
+#         out['rated input power (W)'] = properties["Water Heating"]["Capacity (W)"]
+#         out['water heater type'] = properties["HVAC Heating"]["Equipment Name"]
+#     else:
+#         print("No Water Heating")
+#         out['water heater fuel'] = "None"
+#         out['rated input power (W)'] = 0
+#         out['water heater type'] = "None"
+        
+#     return out
 
 
 

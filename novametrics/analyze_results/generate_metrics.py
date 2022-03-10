@@ -214,6 +214,7 @@ def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder,
         Dictionary of both zero baseline and comparison metrics.
 
     """
+    print(results_folder, results_name)
     if not_none(grid_price_path):
         grid_prices = pd.read_csv(grid_price_path).iloc[:,0].tolist()
     else:
