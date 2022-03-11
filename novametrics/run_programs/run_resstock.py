@@ -2,6 +2,7 @@ import os
 import tarfile
 import subprocess
 import yaml
+import time
 import shutil
 from buildstockbatch.localdocker import LocalDockerBatch
 from pathlib import Path
@@ -15,7 +16,8 @@ def update_temp_output_folder(yaml_path, temp_folder_name = "temp_folder"):
         yaml.safe_dump(doc, f, sort_keys = False)
 
 def run_resstock(main_folder, yaml_name, resstock_outputs_folder, temp_folder_name = "temp_folder", 
-                 simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv")):
+                 simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"), n_workers = 1):
+    t1 = time.time()
     Path(os.path.join(main_folder, temp_folder_name)).mkdir(parents=True, exist_ok=True)
     yaml_path = os.path.join(main_folder, yaml_name)
     update_temp_output_folder(yaml_path, temp_folder_name)
@@ -25,7 +27,7 @@ def run_resstock(main_folder, yaml_name, resstock_outputs_folder, temp_folder_na
     
     Path(os.path.join(main_folder, resstock_outputs_folder)).mkdir(parents=True, exist_ok=True)
     extract_bsb_outputs(main_folder, resstock_outputs_folder, temp_folder_name, simulations_job, root_folder, save_files)
-    
+    print(f"Time to run ResStock was: {time.time() - t1}")
     
 # def call_buildstock_batch(yaml_path, run_type = "buildstock_docker"):
 #     runvals = [run_type, yaml_path]
@@ -37,7 +39,7 @@ def call_buildstock_batch(yaml_path, run_type = "buildstock_docker"):
 
 def docker_buildstock_batch(yaml_path):    
     batch = LocalDockerBatch(yaml_path)
-    batch.run_batch(measures_only = True, n_jobs = 4)
+    batch.run_batch(measures_only = True, n_jobs = n_workers)
     # batch.process_results()    #For if measures only doesnt work
 
 def members(tf, root_folder, save_files):

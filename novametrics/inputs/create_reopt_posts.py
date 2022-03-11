@@ -104,7 +104,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
     ochre_controls : dict
         optional dictionary of OCHRE building model output values (such as folder path).
     """
-    print(f"Creating REopt post {input_vals['post_name']}")
+    # print(f"Creating REopt post {input_vals['post_name']}")
     pathlib.Path(main_output_folder).mkdir(parents=True, exist_ok=True)
     
     post = copy.deepcopy(defaults)
@@ -121,10 +121,12 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
 
     #Load ochre outputs
     if ochre_controls["use_ochre_outputs"]:
-        ochre_outputs = load_ochre_outputs(ochre_controls)
-        #If OCHRE run fails then ochre_outputs will be []. In this case don't add OCHRE values
-        if ochre_outputs != []:
-            parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
+        try:
+            ochre_outputs = load_ochre_outputs(ochre_controls)
+            #If OCHRE run fails then ochre_outputs will be []. In this case don't add OCHRE values
+            parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
+            
+            post["Scenario"]["description"] = building_metadata
             
             if "LoadProfile" not in post["Scenario"]["Site"]:
                 post["Scenario"]["Site"]["LoadProfile"] = {}
@@ -134,8 +136,8 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
                 wh_post(post, ochre_outputs, ochre_controls) # wh_lower_bound, wh_upper_bound, wh_comfort_limit)
             if "HVAC" in input_vals and not_none(input_vals["WH"]):
                 hvac_post(post, ochre_outputs, ochre_controls) #hvac_lower_bound, hvac_upper_bound, hvac_comfort_lower_bound, hvac_comfort_upper_bound)
-        else:
-            print(f"OCHRE outputs failed for {input_vals['post_name']}")
+        except Exception as e:
+            print(f"OCHRE outputs failed for {input_vals['output_subfolder']} post {input_vals['post_name']} due to {e}")
             return None
                 
     #Output subfolder allows for folder structure for REopt posts

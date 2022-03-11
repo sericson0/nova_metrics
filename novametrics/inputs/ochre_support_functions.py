@@ -2,6 +2,7 @@ import os
 import numpy as np
 import pandas as pd
 import yaml
+import xmltodict
 from novametrics.support.utils import load_post, not_none, get_dictionary_value, get_filename
 #%%
 
@@ -86,7 +87,6 @@ def get_properties_file(file_path):
         else:
             out['cooling duct dse'] = 1
     else:
-        print("Building has no HVAC Cooling")
         out['cooling fuel'] = "None"
         out['cooling number of speeds'] = 1
         out['cooling fan power (W/cfm)'] = 0
@@ -126,7 +126,7 @@ def get_yaml_file(file_path):
         Dictionary of OCHRE property values for HVAC and water heater dispatch.
     """
     with open(file_path) as f:
-        properties = yaml.safe_load(f)
+        properties = yaml.safe_load(f)["Equipment"]
 
     out = {}
     if "HVAC Heating" in properties:
@@ -167,7 +167,6 @@ def get_yaml_file(file_path):
         else:
             out['cooling duct dse'] = 1
     else:
-        print("Building has no HVAC Cooling")
         out['cooling fuel'] = "None"
         out['cooling number of speeds'] = 1
         out['cooling fan power (W/cfm)'] = 0
@@ -190,86 +189,44 @@ def get_yaml_file(file_path):
         out['water heater type'] = "None"
         
     return out
-        
-# def get_yaml_file(file_path):
-#     """
-#     Parse .yaml OCHRE property file and return relevant values for REopt integration
 
-#     Parameters
-#     ----------
-#     file_path : str
-#         Path to .properties file.
 
-#     Returns
-#     -------
-#     out : dict
-#         Dictionary of OCHRE property values for HVAC and water heater dispatch.
-#     """
-#     with open(file_path) as f:
-#         properties = yaml.safe_load(f)
 
-#     out = {}
-#     if "HVAC Heating" in properties:
-#         out['heating fuel'] = properties["HVAC Heating"]["Fuel"]
-#         if out["heating fuel"] == "Electric":
-#             out["heating fuel"] = "Electricity"
-#         out['heating number of speeds'] = properties["HVAC Heating"]["Number of Speeds (-)"]
-#         out['heating fan power (W/cfm)'] = properties["HVAC Heating"]["Fan Power (W/cfm)"]
-#         out['heating airflow rate (cfm)'] = properties["HVAC Heating"]["Airflow Rate (cfm)"]
-#         out['heating capacity (W)'] = properties["HVAC Heating"]["Capacity (W)"]
-#         out['heating EIR'] = properties["HVAC Heating"]["EIR (-)"]
-#         if "Duct DSE (-)" in properties["HVAC Heating"]:
-#             out['heating duct dse'] = properties["HVAC Heating"]["Duct DSE (-)"]
-#         else:
-#             out["heating duct dse"] = 1
-            
-#     else:
-#         print(f"Building {file_path} has no HVAC Heating.")
-#         out['heating fuel'] = "None"
-#         out['heating number of speeds'] = 1
-#         out['heating fan power (W/cfm)'] = 0
-#         out['heating airflow rate (cfm)'] = 0
-#         out['heating capacity (W)'] = 0
-#         out['heating EIR'] = 1
-#         out['heating duct dse'] = 1
-        
-#     if "HVAC Cooling" in properties:
-#         out['cooling fuel'] = properties["HVAC Cooling"]["Fuel"]
-#         if out["cooling fuel"] == "Electric":
-#             out["cooling fuel"] = "Electricity"
-#         out['cooling number of speeds'] = properties["HVAC Cooling"]["Number of Speeds (-)"]
-#         out['cooling fan power (W/cfm)'] = properties["HVAC Cooling"]["Fan Power (W/cfm)"]
-#         out['cooling airflow rate (cfm)'] = properties["HVAC Cooling"]["Airflow Rate (cfm)"]
-#         out['cooling capacity (W)'] = properties["HVAC Cooling"]["Capacity (W)"]
-#         out['cooling EIR'] = properties["HVAC Cooling"]["EIR (-)"]
-#         if "Duct DSE (-)" in properties["HVAC Cooling"]:
-#             out['cooling duct dse'] = properties["HVAC Cooling"]["Duct DSE (-)"]
-#         else:
-#             out['cooling duct dse'] = 1
-#     else:
-#         print("Building has no HVAC Cooling")
-#         out['cooling fuel'] = "None"
-#         out['cooling number of speeds'] = 1
-#         out['cooling fan power (W/cfm)'] = 0
-#         out['cooling airflow rate (cfm)'] = 0
-#         out['cooling capacity (W)'] = 0
-#         out['cooling EIR'] = 1
-#         out['cooling duct dse'] = 1
-        
-        
-#     if "Water Heating" in properties:    
-#         out['water heater fuel'] = properties["Water Heating"]["Fuel"]
-#         if out["water heater fuel"] == "Electric":
-#             out["water heater fuel"] = "Electricity"
-#         out['rated input power (W)'] = properties["Water Heating"]["Capacity (W)"]
-#         out['water heater type'] = properties["HVAC Heating"]["Equipment Name"]
-#     else:
-#         print("No Water Heating")
-#         out['water heater fuel'] = "None"
-#         out['rated input power (W)'] = 0
-#         out['water heater type'] = "None"
-        
-#     return out
+def get_building_metadata(xml_filepath, yaml_filepath):
+    string = ""
+    with open(xml_filepath) as f:
+       xml_data = xmltodict.parse(f.read())
+    string += "state|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["StateCode"] + ", "
+    string += "zipcode|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["ZipCode"] + ", "
+    string += "site_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["Site"]["SiteType"]["#text"] + ", "
+    string += "year_built|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["YearBuilt"] + ", "
+    string += "building_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ResidentialFacilityType"] + ", "
+    string += "number_of_bedrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBedrooms"] + ", "
+    # string += "number_of_bathrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBathrooms"] + ", "
+    string += "floor_area|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ConditionedFloorArea"] + ", "
+    string += "climate_zone|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["ClimateandRiskZones"]["ClimateZoneIECC"]["ClimateZone"] + ","
+
+    with open(yaml_filepath) as f:
+        yaml_data = yaml.safe_load(f)
+    string += "occupants|" + str(yaml_data["Occupancy"]["Number of Occupants (-)"]) + ","
+    string += "wall_r_val|" + str(yaml_data["Boundaries"]["Exterior Wall"]["Boundary R Value"]) + ", "
+    string += "heating_type|" + yaml_data["Equipment"]["HVAC Heating"]["Equipment Name"] + ", "
+    string += "heating_fuel|" + yaml_data["Equipment"]["HVAC Heating"]["Fuel"] + ", "
+    string += "water_heater_type|" + yaml_data["Equipment"]["Water Heating"]["Equipment Name"] + ", "
+    string += "water_heater_fuel|" + yaml_data["Equipment"]["Water Heating"]["Fuel"] + ", "
+    if "HVAC Cooling" in yaml_data["Equipment"]:
+        string += "cooling_type|" + yaml_data["Equipment"]["HVAC Cooling"]["Equipment Name"] 
+    else:
+        string += "cooling_type|" + "None"
+    
+    return string
+
+
+# xml_filepath = "D:/test_resstock/ResStock/bldg0000002/in.xml"
+# yaml_filepath = "D:/test_resstock/ResStock/bldg0000002/in.yaml"
+ 
+
+
 
 
 
@@ -379,6 +336,11 @@ def load_ochre_outputs(ochre_controls):
     list
     [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     """
+    input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "ResStock")
+    xml_properties_ext = get_dictionary_value(ochre_controls, "properties_file", "in.xml")
+    
+    
+    ochre_input_file_path = os.path.join(input_main_folder, ochre_controls["ochre_outputs_subfolder"])    
     ochre_output_file_path = os.path.join(ochre_controls["ochre_outputs_main_folder"], ochre_controls["ochre_outputs_subfolder"])    
     properties_file_key = get_dictionary_value(ochre_controls, "properties_file", "in.yaml").rsplit(".", 1)[0] + ".yaml"
     envelope_matrixA_key = get_dictionary_value(ochre_controls, "envelope_matrixA", "_Envelope_matrixA.csv")
@@ -387,32 +349,31 @@ def load_ochre_outputs(ochre_controls):
     water_tank_matrixA_key = get_dictionary_value(ochre_controls, "water_tank_matrixA", "_Water Tank_matrixA.csv")
     water_tank_matrixB_key = get_dictionary_value(ochre_controls, "water_tank_matrixB", "_Water Tank_matrixB.csv")
 
-    try:
-        properties_file = get_filename(ochre_output_file_path, properties_file_key)           
-        b_matrix_file = get_filename(ochre_output_file_path, envelope_matrixB_key)
-        a_matrix_file = get_filename(ochre_output_file_path, envelope_matrixA_key)
-        hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
-        a_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixA_key)
-        b_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixB_key)
-        
-        parsed_prop = parse_properties(os.path.join(ochre_output_file_path, properties_file))
-        a_matrix = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_file), index_col=0)
-        b_matrix = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_file), index_col=0)
-        hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
-        a_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_wh_file), index_col=0)
-        b_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_wh_file), index_col=0)
-        return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
+    xml_file = get_filename(ochre_input_file_path, xml_properties_ext)
+    properties_file = get_filename(ochre_input_file_path, properties_file_key)           
+    b_matrix_file = get_filename(ochre_output_file_path, envelope_matrixB_key)
+    a_matrix_file = get_filename(ochre_output_file_path, envelope_matrixA_key)
+    hourly_inputs_file = get_filename(ochre_output_file_path, hourly_inputs_key)
+    a_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixA_key)
+    b_matrix_wh_file = get_filename(ochre_output_file_path, water_tank_matrixB_key)
     
-    except Exception as e: 
-        print(e)
-        return []
+    parsed_prop = parse_properties(os.path.join(ochre_input_file_path, properties_file))
+    a_matrix = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_file), index_col=0)
+    b_matrix = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_file), index_col=0)
+    hourly_inputs = pd.read_csv(os.path.join(ochre_output_file_path, hourly_inputs_file))
+    a_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_wh_file), index_col=0)
+    b_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_wh_file), index_col=0)
+
+    building_metadata = get_building_metadata(os.path.join(ochre_input_file_path, xml_file), os.path.join(ochre_input_file_path, properties_file))
+    return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata]
+    
 
 
     
 
 
 def wh_post(post, ochre_outputs, ochre_controls):
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
     erwh_size_kw = parsed_prop["erwh_size_kw"]
     hpwh_size_kw = parsed_prop["hpwh_size_kw"]
     
@@ -436,7 +397,7 @@ def wh_post(post, ochre_outputs, ochre_controls):
         init_temperatures_wh = list(init_temperatures_wh.iloc[0])
         
         if hpwh_size_kw > 0.01:
-            hpwh_cop = list(hourly_inputs.loc[:, 'Water Heating Electric Power (kW)'])
+            hpwh_cop = list(hourly_inputs.loc[:, 'Water Heating Heat Pump COP (-)'])
             hpwh_prodfactor = list(hourly_inputs.loc[:, 'Water Heating Heat Pump Max Capacity (kW)'] / hpwh_size_kw)
         else:
             hpwh_cop = []
@@ -487,7 +448,7 @@ def wh_post(post, ochre_outputs, ochre_controls):
 def hvac_post(post, ochre_outputs, ochre_controls):
     n_timesteps = 8760
 
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
     
     hvac_temperature_lower_bound = get_dictionary_value(ochre_controls, "hvac_temperature_lower_bound", 0)
     hvac_temperature_upper_bound = get_dictionary_value(ochre_controls, "hvac_temperature_upper_bound", 40)
@@ -507,7 +468,6 @@ def hvac_post(post, ochre_outputs, ochre_controls):
         try:
             er_on = hourly_inputs.loc[:, 'HVAC Heating ER Power (kW)']
         except:
-            print('No ER element.')
             er_on = pd.Series([-1]*n_timesteps)
     else:
         constant_heating_cop = get_fan_adjustment(hourly_inputs.loc[:, 'HVAC Heating Delivered (kW)'], hourly_inputs.loc[:, 'HVAC Heating Fan Power (kW)'])
@@ -531,8 +491,8 @@ def hvac_post(post, ochre_outputs, ochre_controls):
         cooling_hourly_loads = hourly_inputs.loc[:, 'HVAC Cooling Electric Power (kW)']
         cooling_delivered = hourly_inputs.loc[:, 'HVAC Cooling Delivered (kW)'] * 1000
     else:
-        cooling_hourly_loads = [0]*n_timesteps
-        cooling_delivered = [0]*n_timesteps
+        cooling_hourly_loads = pd.Series([0]*n_timesteps) 
+        cooling_delivered = pd.Series([0]*n_timesteps)
         
     hvac_load = hourly_inputs.loc[:, 'HVAC Heating Electric Power (kW)'] + cooling_hourly_loads
     # HVAC RC characteristics    
@@ -567,7 +527,7 @@ def hvac_post(post, ochre_outputs, ochre_controls):
 
     if "FlexTechFP" not in post['Scenario']['Site']:
         post['Scenario']['Site']["FlexTechHP"] = {}
-        
+    
     post['Scenario']['Site']['LoadProfile']['loads_kw'] = [post['Scenario']['Site']['LoadProfile']['loads_kw'][i] - hvac_load[i] for i in range(len(hvac_load))]
     post['Scenario']['Site']['RC']['use_flexloads_model'] = True
     post['Scenario']['Site']['RC']['a_matrix'] = a_matrix

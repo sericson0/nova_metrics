@@ -1,6 +1,7 @@
 # import sys
 # sys.path.insert(1, './ochre/ochre')
 import os
+import time
 import sys
 import shutil
 # import pandas as pd
@@ -19,6 +20,7 @@ def run_ochre(ochre_controls):
     
     Results saved in same subfolder structure as inputs.
     """
+    t1 = time.time()
     input_main_folder = get_dictionary_value(ochre_controls, "ochre_inputs_main_folder", "ResStock")
     output_main_folder = get_dictionary_value(ochre_controls, "ochre_outputs_main_folder", "OCHRE")
     ochre_weather_file = get_dictionary_value(ochre_controls, "weather_file_path", "https://data.nrel.gov/system/files/156/BuildStock_TMY3_FIPS.zip")
@@ -52,11 +54,12 @@ def run_ochre(ochre_controls):
         print(f"Running OCHRE building {input_path}")
         try:
             run_ochre_single_case(simulation_name, properties_file, schedule_file, ochre_weather_file, default_inputs, output_path)
-            shutil.copy(properties_yaml_name, output_path)
+            # shutil.copy(properties_yaml_name, output_path)
+            # shutil.copy(properties_file, output_path)
         except Exception as e:
             print(f"OCHRE run {input_path} failed. Error {sys.exc_info()[0]} {e}.")
             # shutil.rmtree(output_path)
-        
+    print("Time to run OCHRE:", time.time() - t1)
         
 
 def run_ochre_single_case(simulation_name, properties_file, schedule_file, weather_path, default_input_path, output_folder):

@@ -38,7 +38,7 @@ def clone_repository(repo_url, main_folder, branch = ""):
             else:
                 Repo.clone_from(repo_url, output_folder, branch = branch, progress=CloneProgress())
         except Exception as e:
-            print("Could not clone repository due to error {e}")
+            print(f"Could not clone repository due to error {e}")
 
 
 def check_install(program_name):
