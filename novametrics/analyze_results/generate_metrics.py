@@ -214,7 +214,7 @@ def get_reopt_metrics_single_case(results_folder, results_name, baseline_folder,
         Dictionary of both zero baseline and comparison metrics.
 
     """
-    print(results_folder, results_name)
+    # print(results_folder, results_name)
     if not_none(grid_price_path):
         grid_prices = pd.read_csv(grid_price_path).iloc[:,0].tolist()
     else:
@@ -262,7 +262,7 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     
     d["outdoor_temperature_F"] = results["temperature"]["outdoor_air_temp_degF"]
     
-    if results["temperature"]["temperatures_degree_C"][0] is None:
+    if (len(results["temperature"]["temperatures_degree_C"])==0) or results["temperature"]["temperatures_degree_C"][0] is None:
         d["indoor_temperature_F"] = [None]*HOURS
     else:
         d["indoor_temperature_F"] = [32 + (9/5) * x for x in results["temperature"]["temperatures_degree_C"]]
@@ -271,10 +271,11 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     d["comfort_penalty"] = results["temperature"]["comfort_penalty"]
     
     d["energy_costs_per_kwh"] = results["utility_bill"]["energy_costs_per_kwh"]
-    d["emand_cost_per_kw"] = results["utility_bill"]["demand_charge_per_kw"]
+    d["demand_cost_per_kw"] = results["utility_bill"]["demand_charge_per_kw"]
     
     if output_file_name == "":
         output_file_name = results_name.replace(".json", "") + "_timeseries.csv"
+    
     
     #TODO add timeseries for FlexTechAC, FlexTechHP, FlexTechERWH, FlexTechHPWH    
     df = pd.DataFrame(d)
