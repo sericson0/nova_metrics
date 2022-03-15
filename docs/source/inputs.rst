@@ -66,7 +66,7 @@ API Keys
 ------------
 The *API Keys* sheet specifies user keys for various api databases. There are two columns, *key_name* (which specifies what the api key is for) and *key_val* (which specifies the actual key). 
 * **pv_watts** NREL API key for downloading solar profiles. Can be obtained `here <https://developer.nrel.gov/signup/>`_.
-* **urdb** API key for downloading utility rates. Can be obtained `here <https://openei.org/services/api/signup/>`_.
+* **urdb** API key for downloading utility rates. Can be obtained from this `link <https://openei.org/services/api/signup/>`_.
 * **reopt** NREL API key for running REopt (same as pv_watts). 
 
 
