@@ -76,9 +76,9 @@ Optional sheet which specifies various values for the OCHRE-REopt integration. T
 * **ochre_inputs_main_folder** Specifies the path relative to the main folder where OCHRE input subfolders or files are stored.
 * **ochre_outputs_main_folder** Specifies the path relative to the main folder where OCHRE output subfolders or files are stored.
 * **<output file identifier>** Can input rows to overwrite how REopt searches for the various OCHRE output files. Options are:
-	* *properties_file* Defaults to ".properties".
-	* *envelope_matrixA* Defaults to "_Envelope_matrixA.csv".
-	* *envelope_matrixB* Defaults to "_Envelope_matrixB.csv".
-	* *hourly_inputs* Defaults to "_hourly.csv"
-	* *water_tank_matrixA* Defaults to "_Water Tank_matrixA.csv".
-	* *water_tank_matrixB* Defaults to "_Water Tank_matrixB.csv".
+* *properties_file* Defaults to ".properties".
+* *envelope_matrixA* Defaults to "_Envelope_matrixA.csv".
+* *envelope_matrixB* Defaults to "_Envelope_matrixB.csv".
+* *hourly_inputs* Defaults to "_hourly.csv"
+* *water_tank_matrixA* Defaults to "_Water Tank_matrixA.csv".
+* *water_tank_matrixB* Defaults to "_Water Tank_matrixB.csv".
