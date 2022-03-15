@@ -21,6 +21,7 @@ The available run arguments are:
 * --inputs_file_path [-i] Optional specification for where the Inputs excel file is saved, relative to main_folder. Defaults to *Inputs.xlsx*. 
 * --by_building [-g] If specified then runs REopt post and metrics for each building (subfolder) in OCHRE outputs main folder
 * --start [-s] Optional input to set which folder or file REopt will start running. If omitted then start at first file or folder
+* --n_workers Optional input to set the number of workers for buildstockbatch to run in parallel. Defaults to 2. 
 
 
 Multiple run arguments may be added. Examples of valid commands include::

@@ -16,13 +16,13 @@ def update_temp_output_folder(yaml_path, temp_folder_name = "temp_folder"):
         yaml.safe_dump(doc, f, sort_keys = False)
 
 def run_resstock(main_folder, yaml_name, resstock_outputs_folder, temp_folder_name = "temp_folder", 
-                 simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"), n_workers = 1):
+                 simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"), n_workers = 2):
     t1 = time.time()
     Path(os.path.join(main_folder, temp_folder_name)).mkdir(parents=True, exist_ok=True)
     yaml_path = os.path.join(main_folder, yaml_name)
     update_temp_output_folder(yaml_path, temp_folder_name)
     print("Calling Buildstockbatch")
-    call_buildstock_batch(yaml_path, run_type = "buildstock_docker")
+    call_buildstock_batch(yaml_path, n_workers, run_type = "buildstock_docker")
     print("Extracting Buildstockbatch outputs")
     
     Path(os.path.join(main_folder, resstock_outputs_folder)).mkdir(parents=True, exist_ok=True)
@@ -34,10 +34,10 @@ def run_resstock(main_folder, yaml_name, resstock_outputs_folder, temp_folder_na
 #     subprocess.run(runvals)
 
 
-def call_buildstock_batch(yaml_path, run_type = "buildstock_docker"):
-    docker_buildstock_batch(yaml_path)
+def call_buildstock_batch(yaml_path, n_workers, run_type = "buildstock_docker"):
+    docker_buildstock_batch(yaml_path, n_workers)
 
-def docker_buildstock_batch(yaml_path):    
+def docker_buildstock_batch(yaml_path, n_workers):    
     batch = LocalDockerBatch(yaml_path)
     batch.run_batch(measures_only = True, n_jobs = n_workers)
     # batch.process_results()    #For if measures only doesnt work

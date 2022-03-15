@@ -26,7 +26,7 @@ def main():
     parser.add_argument("-i", "--inputs_file_path", default = "Inputs.xlsx", help = "Optionally specify path to input xlsx file (relative to main folder).")
     parser.add_argument("-g", "--by_building", action = "store_true", help = "If specified then runs REopt post and metrics for each building type")
     parser.add_argument("-s", "--start", type=int, nargs='?', default=1, help = "If specified then sets subfolder to begin running REopt")
-    parser.add_argument("--n_workers", type=int, nargs='?', default=1, help = "Number of workers to run in parallel for buildstockbatcho")
+    parser.add_argument("--n_workers", type=int, nargs='?', default=2, help = "Number of workers to run in parallel for buildstockbatcho")
     args = parser.parse_args()
 
     main_folder = args.main_folder
@@ -58,7 +58,7 @@ def main():
             print("No resstock yaml file specified. Defaulting to resstock.yml in main folder")
            
             run_resstock(main_folder, "resstock.yml", filepaths["resstock_output_main_folder"], temp_folder_name = "temp_folder", 
-                        simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"))
+                        simulations_job = "simulations_job0.tar.gz", root_folder = "up00/", save_files = ("in.xml", "schedules.csv"), n_workers = args.n_workers)
         else:
             raise Exception("Could not fine resstock.yml file. Please specify name in the Inputs File Paths tab or add a file named resstock.yml to the main folder.")
     
