@@ -1,6 +1,6 @@
 Inputs
 ==================
-Inputs which are constant for all runs are specified in the **default_post.json** file. A **default_post** template can be found at the root of the Nova Metrics folder. Any input which is not specified at all uses the REopt default. REopt defaults can be found `Here <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_. 
+Inputs which are constant for all runs are specified in the **default_post.json** file. A **default_post** template can be found at the root of the Nova Metrics folder. Any input which is not specified at all uses the REopt default. REopt defaults can be found in the `Documentation <https://github.com/NREL/REopt_Lite_API/blob/master/reo/nested_inputs.py>`_. 
 
 The Inputs.xlsx file defines scenario-specific inputs and determines what comparison metrics will be calculated. The Inputs.xlsx has **N** Sheets (Update when OCHRE and ResStock are integrated).
 
