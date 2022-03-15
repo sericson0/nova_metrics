@@ -192,34 +192,33 @@ def get_yaml_file(file_path):
 
 
 
-def get_building_metadata(xml_filepath, yaml_filepath):
-    string = ""
-    with open(xml_filepath) as f:
-       xml_data = xmltodict.parse(f.read())
-    string += "state|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["StateCode"] + ", "
-    string += "zipcode|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["ZipCode"] + ", "
-    string += "site_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["Site"]["SiteType"]["#text"] + ", "
-    string += "year_built|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["YearBuilt"] + ", "
-    string += "building_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ResidentialFacilityType"] + ", "
-    string += "number_of_bedrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBedrooms"] + ", "
-    # string += "number_of_bathrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBathrooms"] + ", "
-    string += "floor_area|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ConditionedFloorArea"] + ", "
-    string += "climate_zone|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["ClimateandRiskZones"]["ClimateZoneIECC"]["ClimateZone"] + ","
+# def get_building_metadata(xml_filepath, yaml_filepath):
+#     string = ""
+#     with open(xml_filepath) as f:
+#        xml_data = xmltodict.parse(f.read())
+#     string += "state|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["StateCode"] + ", "
+#     string += "zipcode|" + xml_data["HPXML"]["Building"]["Site"]["Address"]["ZipCode"] + ", "
+#     string += "site_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["Site"]["SiteType"]["#text"] + ", "
+#     string += "year_built|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["YearBuilt"] + ", "
+#     string += "building_type|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ResidentialFacilityType"] + ", "
+#     string += "number_of_bedrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBedrooms"] + ", "
+#     # string += "number_of_bathrooms|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["NumberofBathrooms"] + ", "
+#     string += "floor_area|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["BuildingSummary"]["BuildingConstruction"]["ConditionedFloorArea"] + ", "
+#     string += "climate_zone|" + xml_data["HPXML"]["Building"]["BuildingDetails"]["ClimateandRiskZones"]["ClimateZoneIECC"]["ClimateZone"] + ","
 
-    with open(yaml_filepath) as f:
-        yaml_data = yaml.safe_load(f)
-    string += "occupants|" + str(yaml_data["Occupancy"]["Number of Occupants (-)"]) + ","
-    string += "wall_r_val|" + str(yaml_data["Boundaries"]["Exterior Wall"]["Boundary R Value"]) + ", "
-    string += "heating_type|" + yaml_data["Equipment"]["HVAC Heating"]["Equipment Name"] + ", "
-    string += "heating_fuel|" + yaml_data["Equipment"]["HVAC Heating"]["Fuel"] + ", "
-    string += "water_heater_type|" + yaml_data["Equipment"]["Water Heating"]["Equipment Name"] + ", "
-    string += "water_heater_fuel|" + yaml_data["Equipment"]["Water Heating"]["Fuel"] + ", "
-    if "HVAC Cooling" in yaml_data["Equipment"]:
-        string += "cooling_type|" + yaml_data["Equipment"]["HVAC Cooling"]["Equipment Name"] 
-    else:
-        string += "cooling_type|" + "None"
-    
-    return string
+#     with open(yaml_filepath) as f:
+#         yaml_data = yaml.safe_load(f)
+#     string += "occupants|" + str(yaml_data["Occupancy"]["Number of Occupants (-)"]) + ","
+#     string += "wall_r_val|" + str(yaml_data["Boundaries"]["Exterior Wall"]["Boundary R Value"]) + ", "
+#     string += "heating_type|" + yaml_data["Equipment"]["HVAC Heating"]["Equipment Name"] + ", "
+#     string += "heating_fuel|" + yaml_data["Equipment"]["HVAC Heating"]["Fuel"] + ", "
+#     string += "water_heater_type|" + yaml_data["Equipment"]["Water Heating"]["Equipment Name"] + ", "
+#     string += "water_heater_fuel|" + yaml_data["Equipment"]["Water Heating"]["Fuel"] + ", "
+#     if "HVAC Cooling" in yaml_data["Equipment"]:
+#         string += "cooling_type|" + yaml_data["Equipment"]["HVAC Cooling"]["Equipment Name"] 
+#     else:
+#         string += "cooling_type|" + "None"
+#     return string
 
 
 # xml_filepath = "D:/test_resstock/ResStock/bldg0000002/in.xml"
@@ -364,8 +363,8 @@ def load_ochre_outputs(ochre_controls):
     a_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, a_matrix_wh_file), index_col=0)
     b_matrix_wh = pd.read_csv(os.path.join(ochre_output_file_path, b_matrix_wh_file), index_col=0)
 
-    building_metadata = get_building_metadata(os.path.join(ochre_input_file_path, xml_file), os.path.join(ochre_input_file_path, properties_file))
-    return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata]
+    # building_metadata = get_building_metadata(os.path.join(ochre_input_file_path, xml_file), os.path.join(ochre_input_file_path, properties_file))
+    return [parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh]
     
 
 
@@ -373,7 +372,7 @@ def load_ochre_outputs(ochre_controls):
 
 
 def wh_post(post, ochre_outputs, ochre_controls):
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
     erwh_size_kw = parsed_prop["erwh_size_kw"]
     hpwh_size_kw = parsed_prop["hpwh_size_kw"]
     
@@ -448,7 +447,7 @@ def wh_post(post, ochre_outputs, ochre_controls):
 def hvac_post(post, ochre_outputs, ochre_controls):
     n_timesteps = 8760
 
-    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
+    parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh = ochre_outputs
     
     hvac_temperature_lower_bound = get_dictionary_value(ochre_controls, "hvac_temperature_lower_bound", 0)
     hvac_temperature_upper_bound = get_dictionary_value(ochre_controls, "hvac_temperature_upper_bound", 40)

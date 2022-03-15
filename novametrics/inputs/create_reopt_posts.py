@@ -125,8 +125,7 @@ def create_single_reopt_post(defaults, input_vals, main_output_folder, add_pv_pr
             ochre_outputs = load_ochre_outputs(ochre_controls)
             #If OCHRE run fails then ochre_outputs will be []. In this case don't add OCHRE values
             parsed_prop, a_matrix, b_matrix, hourly_inputs, a_matrix_wh, b_matrix_wh, building_metadata = ochre_outputs
-            
-            post["Scenario"]["description"] = building_metadata
+            # post["Scenario"]["description"] = building_metadata
             
             if "LoadProfile" not in post["Scenario"]["Site"]:
                 post["Scenario"]["Site"]["LoadProfile"] = {}
