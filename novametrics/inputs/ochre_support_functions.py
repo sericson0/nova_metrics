@@ -292,7 +292,7 @@ def wh_post(post, ochre_outputs, ochre_controls):
         init_temperatures_wh = list(init_temperatures_wh.iloc[0])
         
         if hpwh_size_kw > 0.01:
-            hpwh_cop = list(hourly_inputs.loc[:, 'Water Heating Electric Power (kW)'])
+            hpwh_cop = list(hourly_inputs.loc[:, 'Water Heating Heat Pump COP (-)'])
             hpwh_prodfactor = list(hourly_inputs.loc[:, 'Water Heating Heat Pump Max Capacity (kW)'] / hpwh_size_kw)
         else:
             hpwh_cop = []

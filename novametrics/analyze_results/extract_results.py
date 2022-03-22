@@ -54,7 +54,10 @@ def storage_values(reopt_results):
         d["kwh_capacity"] = outputs["Storage"]["size_kwh"]
         d["annual_exports"] = sum(outputs["Storage"]["year_one_to_grid_series_kw"])
         d["hourly_exports"] = outputs["Storage"]["year_one_to_grid_series_kw"]
-        
+        d["grid_to_storage"] = outputs["ElectricTariff"]["year_one_to_battery_series_kw"]
+        d["pv_to_storage"] = outputs["PV"]["year_one_to_battery_series_kw"]
+        d["storage_to_load"] = outputs["Storage"]["year_one_to_load_series_kw"]
+            
         dispatch = [outputs["Storage"]["year_one_to_load_series_kw"][i] + outputs["Storage"]["year_one_to_grid_series_kw"][i] for i in range(HOURS)]
         d["annual_generation"] = sum(dispatch)
         d["hourly_generation"] = dispatch
@@ -68,6 +71,9 @@ def storage_values(reopt_results):
     else:
         d = return_zero_values()
         d["state_of_charge"] = [0]*HOURS
+        d["grid_to_storage"] = [0]*HOURS
+        d["pv_to_storage"] = [0]*HOURS
+        d["storage_to_load"] = [0]*HOURS
     return d
 #%%
 def financial_values(reopt_results):
@@ -78,7 +84,8 @@ def financial_values(reopt_results):
         "LCC": outputs["lcc_us_dollars"],
         "net_capital_costs": outputs["net_capital_costs"],
         "initial_capital_costs": outputs["initial_capital_costs"],
-        "total_om_cost": outputs["total_om_costs_us_dollars"] #,
+        "total_om_cost": outputs["total_om_costs_us_dollars"],
+        "total_production_incentive": outputs["total_production_incentive_after_tax"]
         # "total_production_incentive_benefit": outputs["total_production_incentive_after_tax"]        
         }
     return d
@@ -90,13 +97,16 @@ def load_values(reopt_results):
     
     pv_to_grid = outputs["PV"]["year_one_to_grid_series_kw"]
     pv_to_load = outputs["PV"]["year_one_to_load_series_kw"]
+    d["pv_to_load"] = outputs["PV"]["year_one_to_load_series_kw"]
     if len(pv_to_load) == 0:
         pv_to_grid = [0]*HOURS
         pv_to_load = [0]*HOURS
+        d["pv_to_load"] = [0]*HOURS
     
     d["net_load"] = [d["grid_purchases_kw"][h] - pv_to_grid[h] - outputs["Storage"]["year_one_to_grid_series_kw"][h] for h in range(HOURS)]
     d["home_load"] = [outputs["ElectricTariff"]["year_one_to_load_series_kw"][h] + pv_to_load[h] + outputs["Storage"]["year_one_to_load_series_kw"][h] for h in range(HOURS)]
     d["annual_grid_purchases"] = sum(d["grid_purchases_kw"])
+    d["grid_to_load"] = outputs["ElectricTariff"]["year_one_to_load_series_kw"]
     return d
 #%%
 
@@ -125,8 +135,8 @@ def resilience_values(reopt_results, critical_loads):
     battery = outputs["Storage"]
     pv = outputs["PV"]
      #Calculate Resilience Metrics
-    resilience_no_notice = simulate_outages(batt_kwh= battery["size_kw"], 
-                                          batt_kw= battery["size_kwh"], 
+    resilience_no_notice = simulate_outages(batt_kwh= battery["size_kwh"], 
+                                          batt_kw= battery["size_kw"], 
                                           pv_kw_ac_hourly= pv["year_one_power_production_series_kw"], 
                                           init_soc= battery["year_one_soc_series_pct"], 
                                           critical_loads_kw= critical_loads, 
@@ -141,10 +151,11 @@ def utility_bill(reopt_results):
     outputs = reopt_results["outputs"]["Scenario"]["Site"]["ElectricTariff"]
     
     d = {"annual_bill": outputs["year_one_bill_us_dollars"], 
-         "total_utility_energy_cost": outputs["year_one_energy_cost_us_dollars"], 
+         "annual_utility_energy_cost": outputs["year_one_energy_cost_us_dollars"], 
          # "total_fuel_cost": reopt_results["outputs"]["Scenario"]["Site"]["FuelTariff"]["total_fuel_cost_us_dollars"],
-         
-         "total_utility_demand_cost": outputs["year_one_demand_cost_us_dollars"],
+         "total_utility_energy_cost": outputs["total_energy_cost_us_dollars"],
+         "annual_utility_demand_cost": outputs["year_one_demand_cost_us_dollars"],
+         "total_utility_demand_cost": outputs["total_demand_cost_us_dollars"],
          "total_energy": outputs["total_energy_cost_us_dollars"],
          "energy_costs_per_kwh" : outputs["year_one_energy_cost_series_us_dollars_per_kwh"],
          "demand_charge_per_kw": outputs["year_one_demand_cost_series_us_dollars_per_kw"],
@@ -152,7 +163,8 @@ def utility_bill(reopt_results):
          "total_utility_min_cost_adder_cost": outputs["total_min_charge_adder_us_dollars"],
          "total_utility_coincident_peak_cost": outputs["total_coincident_peak_cost_us_dollars"],
          "total_utility_coincident_peak_cost_bau": outputs["total_coincident_peak_cost_bau_us_dollars"],
-         "total_export_benefit": outputs["total_export_benefit_us_dollars"]
+         "total_export_benefit": outputs["total_export_benefit_us_dollars"],
+         "total_ra_value": outputs["total_ra_value"]
          # ,
          # "total_resource_adequacy_benefit": outputs["total_resource_adequacy_benefit"]
          }
@@ -176,8 +188,8 @@ def flex_tech_values(reopt_results, tech_name):
             d["hourly_generation"] = outputs["year_one_power_production_series_kw"]
             d["annual_generation"] = sum(outputs["year_one_power_production_series_kw"])
             d["upfront_capital_cost"] = outputs["size_kw"] * inputs["installed_cost_us_dollars_per_kw"]
-            d["hourly_load"]: outputs["year_one_power_consumption_series_kw"]
-            d["annual_load"]: sum(outputs["year_one_power_consumption_series_kw"])
+            d["hourly_load"] = outputs["year_one_power_consumption_series_kw"]
+            d["annual_load"] = sum(outputs["year_one_power_consumption_series_kw"])
         elif outputs["year_one_power_consumption_series_kw"] != None and len(outputs["year_one_power_consumption_series_kw"]) > 0:
             d["kw_capacity"] = inputs["size_kw"]
             d["kwh_capacity"] = 0
@@ -185,9 +197,9 @@ def flex_tech_values(reopt_results, tech_name):
             d["hourly_exports"] = [0]*HOURS
             d["hourly_generation"] = outputs["year_one_power_production_series_kw"]
             d["annual_generation"] = sum(outputs["year_one_power_production_series_kw"])
-            d["upfront_capital_cost"] = outputs["size_kw"] * inputs["installed_cost_us_dollars_per_kw"]
-            d["hourly_load"]: outputs["year_one_power_consumption_series_kw"]
-            d["annual_load"]: sum(outputs["year_one_power_consumption_series_kw"])
+            d["upfront_capital_cost"] = inputs["size_kw"] * inputs["installed_cost_us_dollars_per_kw"]
+            d["hourly_load"] = outputs["year_one_power_consumption_series_kw"]
+            d["annual_load"] = sum(outputs["year_one_power_consumption_series_kw"])
             
         else:
             d = return_zero_values()
@@ -209,11 +221,11 @@ def emissions_values(reopt_results):
         "total_emissions_tons_CO2" : outputs["lifecycle_emissions_tCO2"]
         # "hourly_emissions_factors_lb_CO2_per_kwh": reopt_results["inputs"]["Scenario"]["Site"]["ElectricTariff"]["emissions_factor_series_lb_CO2_per_kwh"]
         }
-    if reopt_results["inputs"]["Scenario"]["Site"].get("include_climate_in_objective"):
+    if reopt_results["inputs"]["Scenario"].get("include_climate_in_objective"):
         d["total_climate_cost"] = outputs["lifecycle_emissions_cost_CO2"]
     else:
         d["total_climate_cost"] = 0
-    if reopt_results["inputs"]["Scenario"]["Site"].get("include_health_in_objective"):
+    if reopt_results["inputs"]["Scenario"].get("include_health_in_objective"):
         d["total_health_cost"] = outputs["lifecycle_emissions_cost_Health"]
     else:
         d["total_health_cost"] = 0
@@ -226,10 +238,12 @@ def comfort_values(reopt_results):
     "total_wh_comfort_cost": 0,
     "total_hvac_comfort_cost": 0
         }
-    if "RC" in reopt_results["outputs"]["Scenario"]["Site"]:
-        outputs = reopt_results["outputs"]["Scenario"]["Site"]["RC"]
+    if "HotWaterTank" in reopt_results["outputs"]["Scenario"]["Site"]:
+        outputs = reopt_results["outputs"]["Scenario"]["Site"]["HotWaterTank"]
         if "wh_comfort_cost_total" in outputs:
             d["total_wh_comfort_cost"] = outputs["wh_comfort_cost_total"]
+    if "RC" in reopt_results["outputs"]["Scenario"]["Site"]:
+        outputs = reopt_results["outputs"]["Scenario"]["Site"]["RC"]
         if "hvac_comfort_cost_total" in outputs:
             d["total_hvac_comfort_cost"] = outputs["hvac_comfort_cost_total"]
     return d

@@ -113,8 +113,10 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["External-annual_grid_purchases_kwh"] = results["load"]["annual_grid_purchases"] 
     
     d["Financial-annual_bill"] = results["utility_bill"]["annual_bill"]
-    d["Financial-annual_energy_bill"] = results["utility_bill"]["total_utility_energy_cost"]
-    d["Financial-annual_demand_charges"] = results["utility_bill"]["total_utility_demand_cost"]
+    
+    #ChangesFromMcKnight: Changed assignment from total to year_one
+    d["Financial-annual_energy_bill"] = results["utility_bill"]["annual_utility_energy_cost"]
+    d["Financial-annual_demand_charges"] = results["utility_bill"]["annual_utility_demand_cost"]
     
     # d["External-annual_emissions_tons_CO2"] = results["emissions"]["annual_emissions_tons_CO2"]
     # d["External-avg_emissions_rate_lb_CO2_per_kwh"] = results["emissions"]["annual_emissions_lb_CO2"]/d["Home-annual_home_load"]
@@ -133,6 +135,9 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["LCC Breakdown-total_utility_coincident_peak_cost"] = results["utility_bill"]["total_utility_coincident_peak_cost"]
     d["LCC Breakdown-total_utility_coincident_peak_cost_bau"] = results["utility_bill"]["total_utility_coincident_peak_cost_bau"]
     d["LCC Breakdown-total_export_benefit"] = results["utility_bill"]["total_export_benefit"]
+    #ChangesFromMcKnight: Added additional LCC components
+    d["LCC Breakdown-total_production_incentive"] = -results["financial"]["total_production_incentive"]
+    d["LCC Breakdown-total_ra_value"] = results["utility_bill"]["total_ra_value"]
     # d["LCC Breakdown-total_production_incentive_benefit"] = results["financial"]["total_production_incentive_benefit"]
     d["LCC Breakdown-total_climate_cost"] = results["emissions"]["total_climate_cost"]
     d["LCC Breakdown-total_health_cost "] = results["emissions"]["total_health_cost"]
@@ -169,7 +174,8 @@ def comparison_metrics(results, baseline, baseline_type = "tech_baseline"):
     
     d["Financial-npv"] = baseline["financial"]["LCC"] - results["financial"]["LCC"]
     d["Financial-annual_bill_reduction"] = baseline["utility_bill"]["annual_bill"] - results["utility_bill"]["annual_bill"]
-    d["Financial-annual_energy_bill_reduction"] = baseline["utility_bill"]["total_utility_energy_cost"] - results["utility_bill"]["total_utility_energy_cost"]
+    #ChangesFromMcKnight: Changed assignment from total to year_one
+    d["Financial-annual_energy_bill_reduction"] = baseline["utility_bill"]["annual_utility_energy_cost"] - results["utility_bill"]["annual_utility_energy_cost"]
     d["Financial-annual_export_benefits"] = baseline["utility_bill"]["total_export_benefit"] - results["utility_bill"]["total_export_benefit"]
     
     d["Home-load_reduction_kwh"] = sum(baseline["load"]["home_load"]) - sum(results["load"]["home_load"])
@@ -247,36 +253,71 @@ def get_timeseries_single_case(results_folder, results_name, timesereies_output_
     results = extract_results(results_folder, results_name)
     
     d = {}
+
+    #ChangesFromMcKnight: Changed the reported timeseries to make plotting dispatch charts easier. These changes are just for convenience for McKnight runs, it's ok to reject these changes
+    d["home_load"] = results["load"]["home_load"]
+    d["grid_to_load"] = results["load"]["grid_to_load"]
+    d["pv_to_load"] = results["load"]["pv_to_load"]
+    d["storage_to_load"] = results["Storage"]["storage_to_load"]
+
+    d["pv_to_storage"] = results["Storage"]["pv_to_storage"]
+    d["grid_to_storage"] = results["Storage"]["grid_to_storage"]
+    
     d["pv_exports"] = results["PV"]["hourly_exports"]
-    d["pv_generation"] = results["PV"]["hourly_generation"]
+    #d["pv_generation"] = results["PV"]["hourly_generation"]
     
     d["storage_exports"] = results["Storage"]["hourly_exports"]
-    d["storage_discharge"] = results["Storage"]["hourly_generation"]
-    d["storage_charge"] = results["Storage"]["hourly_load"]
+    #d["storage_discharge"] = results["Storage"]["hourly_generation"]
+    #d["storage_charge"] = results["Storage"]["hourly_load"]
     d["storage_state_of_charge"] = results["Storage"]["state_of_charge"]
-    d["home_load"] = results["load"]["home_load"]
-    d["grid_purchases"] = results["load"]["grid_purchases_kw"]
-    d["net_load"] = results["load"]["net_load"]
+    #d["grid_purchases"] = results["load"]["grid_purchases_kw"]
+    #d["net_load"] = results["load"]["net_load"]
+
+    #ChangesFromMcKnight: Added timeseries for FlexTechAC, FlexTechHP, FlexTechERWH, FlexTechHPWH
+    if results["FlexTechAC"]["annual_load"] > 0:
+        d["ac_load"] = results["FlexTechAC"]["hourly_load"]
+    if results["FlexTechHP"]["annual_load"] > 0:
+        d["hp_load"] = results["FlexTechHP"]["hourly_load"]
+    if results["FlexTechERWH"]["annual_load"] > 0:
+        d["erwh_load"] = results["FlexTechERWH"]["hourly_load"]
+    if results["FlexTechHPWH"]["annual_load"] > 0:
+        d["hpwh_load"] = results["FlexTechHPWH"]["hourly_load"]
+            
+    #d["outdoor_temperature_F"] = results["temperature"]["outdoor_air_temp_degF"]
     
-    d["outdoor_temperature_F"] = results["temperature"]["outdoor_air_temp_degF"]
-    
-    if results["temperature"]["temperatures_degree_C"][0] is None:
-        d["indoor_temperature_F"] = [None]*HOURS
-    else:
-        d["indoor_temperature_F"] = [32 + (9/5) * x for x in results["temperature"]["temperatures_degree_C"]]
+    #if results["temperature"]["temperatures_degree_C"][0] is None:
+    #    d["indoor_temperature_F"] = [None]*HOURS
+    #else:
+    #    d["indoor_temperature_F"] = [32 + (9/5) * x for x in results["temperature"]["temperatures_degree_C"]]
     
     
-    d["comfort_penalty"] = results["temperature"]["comfort_penalty"]
+    #d["comfort_penalty"] = results["temperature"]["comfort_penalty"]
     
-    d["energy_costs_per_kwh"] = results["utility_bill"]["energy_costs_per_kwh"]
-    d["emand_cost_per_kw"] = results["utility_bill"]["demand_charge_per_kw"]
+    #d["energy_costs_per_kwh"] = results["utility_bill"]["energy_costs_per_kwh"]
+    #d["demand_cost_per_kw"] = results["utility_bill"]["demand_charge_per_kw"]
     
     if output_file_name == "":
         output_file_name = results_name.replace(".json", "") + "_timeseries.csv"
     
-    #TODO add timeseries for FlexTechAC, FlexTechHP, FlexTechERWH, FlexTechHPWH    
+    #TODO add timeseries for FlexTechAC, FlexTechHP, FlexTechERWH, FlexTechHPWH
+    #ChangesFromMcKnight:TODO addressed above    
     df = pd.DataFrame(d)
     df.to_csv(os.path.join(timesereies_output_folder, output_file_name), index=False)  
+
+#%%
+#ChangesFromMcKnight: Cut and pasted this function from below to maintain call order
+def generate_timeseries(reopt_results_folder, timeseries_output_folder):
+    paths = [f for f in glob.iglob(os.path.join(reopt_results_folder, "**"), recursive=True) if os.path.isfile(f) and f.endswith(".json")]
+    
+    for path in paths:
+        path_dir, file_name = os.path.split(path)
+        relative_dir = os.path.relpath(path_dir, reopt_results_folder)
+        output_folder = os.path.join(timeseries_output_folder, relative_dir)
+        Path(output_folder).mkdir(parents=True, exist_ok=True)
+        
+        output_file_name = file_name.replace(".json", "_timeseries.csv")
+        
+        get_timeseries_single_case(path_dir, file_name, output_folder, output_file_name)
 #%%
 def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_results_file_name, wholesale_price_folder = "./", by_building = False):
     """
@@ -347,16 +388,7 @@ def generate_metrics(reopt_results_folder, inputs, metrics_folder, metrics_resul
     with pd.ExcelWriter(os.path.join(metrics_folder, metrics_results_file_name)) as writer:
         for sheet_name in ["Run Type", "Financial", "LCC Breakdown", "Home", "External", "PV", "Storage", "HP", "ERWH"]:
             d[sheet_name].to_excel(writer, sheet_name = sheet_name, index = False)
-#%%
-def generate_timeseries(reopt_results_folder, timeseries_output_folder):
-    paths = [f for f in glob.iglob(os.path.join(reopt_results_folder, "**"), recursive=True) if os.path.isfile(f) and f.endswith(".json")]
-    
-    for path in paths:
-        path_dir, file_name = os.path.split(path)
-        relative_dir = os.path.relpath(path_dir, reopt_results_folder)
-        output_folder = os.path.join(timeseries_output_folder, relative_dir)
-        Path(output_folder).mkdir(parents=True, exist_ok=True)
-        
-        output_file_name = file_name.replace(".json", "_timeseries.csv")
-        
-        get_timeseries_single_case(path_dir, file_name, output_folder, output_file_name)
+    #ChangesFromMcKnight: Added function call
+    timeseries_output_folder = os.path.join(metrics_folder, "TimeSeries")
+    generate_timeseries(reopt_results_folder, timeseries_output_folder)
+
