@@ -136,8 +136,8 @@ def zero_baseline_metrics(results, grid_prices = []):
     d["LCC Breakdown-total_utility_coincident_peak_cost_bau"] = results["utility_bill"]["total_utility_coincident_peak_cost_bau"]
     d["LCC Breakdown-total_export_benefit"] = results["utility_bill"]["total_export_benefit"]
     #ChangesFromMcKnight: Added additional LCC components
-    d["LCC Breakdown-total_production_incentive"] = -results["financial"]["total_production_incentive"]
-    d["LCC Breakdown-total_ra_value"] = results["utility_bill"]["total_ra_value"]
+    #d["LCC Breakdown-total_production_incentive"] = -results["financial"]["total_production_incentive"]
+    #d["LCC Breakdown-total_ra_value"] = results["utility_bill"]["total_ra_value"]
     # d["LCC Breakdown-total_production_incentive_benefit"] = results["financial"]["total_production_incentive_benefit"]
     d["LCC Breakdown-total_climate_cost"] = results["emissions"]["total_climate_cost"]
     d["LCC Breakdown-total_health_cost "] = results["emissions"]["total_health_cost"]

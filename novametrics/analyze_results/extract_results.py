@@ -85,7 +85,7 @@ def financial_values(reopt_results):
         "net_capital_costs": outputs["net_capital_costs"],
         "initial_capital_costs": outputs["initial_capital_costs"],
         "total_om_cost": outputs["total_om_costs_us_dollars"],
-        "total_production_incentive": outputs["total_production_incentive_after_tax"]
+        #"total_production_incentive": outputs["total_production_incentive_after_tax"]
         # "total_production_incentive_benefit": outputs["total_production_incentive_after_tax"]        
         }
     return d
@@ -164,7 +164,7 @@ def utility_bill(reopt_results):
          "total_utility_coincident_peak_cost": outputs["total_coincident_peak_cost_us_dollars"],
          "total_utility_coincident_peak_cost_bau": outputs["total_coincident_peak_cost_bau_us_dollars"],
          "total_export_benefit": outputs["total_export_benefit_us_dollars"],
-         "total_ra_value": outputs["total_ra_value"]
+         #"total_ra_value": outputs["total_ra_value"]
          # ,
          # "total_resource_adequacy_benefit": outputs["total_resource_adequacy_benefit"]
          }
