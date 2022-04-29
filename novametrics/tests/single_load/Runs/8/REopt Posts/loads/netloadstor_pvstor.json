@@ -10072,7 +10072,6 @@
           "fixedchargefirstmeter": 0.641,
           "fixedchargeunits": "$/day"
         },
-        "add_blended_rates_to_urdb_rate": false,
         "blended_monthly_rates_us_dollars_per_kwh": [
           0.0,
           0.0,
@@ -10103,40 +10102,40 @@
         ],
         "coincident_peak_load_active_timesteps": [
           [
-            42.0
+            42
           ],
           [
-            787.0
+            787
           ],
           [
-            1856.0
+            1856
           ],
           [
-            2532.0
+            2532
           ],
           [
-            3621.0
+            3621
           ],
           [
-            4341.0
+            4341
           ],
           [
-            4388.0
+            4388
           ],
           [
-            5756.0
+            5756
           ],
           [
-            5948.0
+            5948
           ],
           [
-            7147.0
+            7147
           ],
           [
-            7626.0
+            7626
           ],
           [
-            8442.0
+            8442
           ]
         ],
         "coincident_peak_load_charge_us_dollars_per_kw": [
@@ -18930,7 +18929,8 @@
           0.087666667,
           0.008316667
         ],
-        "azimuth": 270
+        "azimuth": 270,
+        "pbi_us_dollars_per_kwh": 0.053
       },
       "Storage": {
         "min_kwh": 0.0,
